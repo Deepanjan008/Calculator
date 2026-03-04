@@ -35,3 +35,28 @@ This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) 
 
 ---
 *Made with ❤️ for privacy lovers.*
+
+---
+
+## 🤝 Contributing
+
+We love contributions! Whether you're fixing a bug, adding a feature, or improving documentation, your help is welcome. 
+
+1. **Fork** the repository.
+2. **Clone** your fork (`git clone ...`).
+3. **Create a Branch** (`git checkout -b feature/YourFeature`).
+4. **Commit** your changes (`git commit -m 'Add some feature'`).
+5. **Push** to the branch (`git push origin feature/YourFeature`).
+6. **Open a Pull Request**.
+
+Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+
+## 👥 Contributors
+
+Thanks to these wonderful people who have contributed to Neo Calculator:
+
+<a href="https://github.com/deepanjanxyz/Calculator000/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=deepanjanxyz/Calculator000" />
+</a>
+
+*Made with ❤️ by the community.*

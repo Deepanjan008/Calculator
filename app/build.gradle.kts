@@ -46,7 +46,6 @@ android {
         compose = true
     }
     composeOptions {
-        // Kotlin 1.9.22 এর জন্য এটাই সঠিক
         kotlinCompilerExtensionVersion = "1.5.8"
     }
 }
@@ -56,21 +55,23 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
     
-    // FIX 1: BOM আপডেট করা হলো (2024.04.01) যাতে AutoMirrored আর HorizontalDivider কাজ করে
+    // Compose BOM 2024.04.01 (ইতোমধ্যে কাজ করছে)
     implementation(platform("androidx.compose:compose-bom:2024.04.01"))
-    
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     
-    // FIX 2: আইকন এরর ফিক্স করার জন্য Extended Icons যোগ করা হলো
+    // Extended Icons (আগের ফিক্স)
     implementation("androidx.compose.material:material-icons-extended")
     
-    // Hilt Dependency Injection
-    implementation("com.google.dagger:hilt-android:2.48")
-    kapt("com.google.dagger:hilt-android-compiler:2.48")
+    // FIX: Hilt & Dagger Updated to 2.51.1 (Fixes 'dagger.internal.Provider' error)
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    
+    // Dagger Core (Explicitly added to prevent missing class error)
+    implementation("com.google.dagger:dagger:2.51.1")
     
     // DataStore & Navigation
     implementation("androidx.datastore:datastore-preferences:1.0.0")

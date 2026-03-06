@@ -19,7 +19,6 @@ android {
 
     signingConfigs {
         create("release") {
-            // গিটহাব সিক্রেটস থেকে পাসওয়ার্ড নেবে
             storeFile = file("release.jks")
             storePassword = System.getenv("NEO_STORE_PASSWORD")
             keyAlias = System.getenv("NEO_KEY_ALIAS")
@@ -45,7 +44,8 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        // ফিক্স: 1.5.1 এর বদলে 1.5.8 (যা Kotlin 1.9.22 এর সাথে কাজ করে)
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
 }
 

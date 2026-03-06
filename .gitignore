@@ -22,3 +22,4 @@ signing.properties
 # APK and Signatures
 *.apk
 *.idsig
+keystore_base64.txt

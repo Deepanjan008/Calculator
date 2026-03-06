@@ -19,3 +19,6 @@ local.properties
 *.jks
 *.keystore
 signing.properties
+# APK and Signatures
+*.apk
+*.idsig

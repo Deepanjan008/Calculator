@@ -23,3 +23,7 @@ signing.properties
 *.apk
 *.idsig
 keystore_base64.txt
+# Extra build and temp files
+compiled_res.flata
+b64_key.txt
+.idea/

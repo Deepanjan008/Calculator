@@ -1,8 +1,8 @@
 name: Build and Sign APK
 
 on:
-  push:
-    branches: [ "main" ]
+  # অটোমেটিক বিল্ড বন্ধ, এখন শুধু বাটন টিপলে রান হবে
+  workflow_dispatch:
 
 jobs:
   build:
@@ -33,3 +33,4 @@ jobs:
       with:
         name: Neo-Calculator-Signed
         path: app/build/outputs/apk/release/*.apk
+

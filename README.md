@@ -2,10 +2,11 @@
 
 <p align="left">
   <img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg" alt="License">
-  <img src="https://img.shields.io/badge/Precision-Infinite-red.svg" alt="Infinite Precision">
+  <img src="https://img.shields.io/badge/Version-1.0.0-orange.svg" alt="Version">
+  <img src="https://img.shields.io/badge/UI-Glassmorphism-pink.svg" alt="Design">
 </p>
 
-A high-performance utility suite featuring an **Advanced Mathematical Engine** capable of handling massive computations with ease.
+**Neo-Calculator** is a high-performance, all-in-one utility suite. From basic arithmetic to massive astronomical computations, it handles everything with precision and style.
 
 ---
 
@@ -18,12 +19,19 @@ A high-performance utility suite featuring an **Advanced Mathematical Engine** c
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="180">
 </p>
 
-### 🚀 Killer Features
+### 🚀 Key Modules
 
-* **🔥 Extreme Calculation Engine:** Calculate factorials up to **10,000!** and beyond without breaking a sweat.
-* **⚡ High Precision:** Handles astronomical numbers with BigInteger support.
-* **🛠️ Pro Utility Suite:** Integrated converters, health trackers, and financial tools.
-* **🎨 Glassmorphism UI:** Premium Sunset Pink aesthetic with modern animations.
+* **🔢 Advanced Math Engine:** Capable of calculating massive factorials (up to **10,000!**) with infinite precision.
+* **⚖️ Unit Converter:** Comprehensive tools for Length, Weight, Data, and Temperature.
+* **🏥 Health & Finance:** Built-in BMI calculator, Age tracker, and Currency tools.
+* **🎨 Premium Aesthetics:** Features a sleek **Sunset Pink** theme with modern Glassmorphism.
+* **📳 Haptic Experience:** Tactile feedback for every interaction to ensure precision.
 
 ---
-<p align="center">Developed by **Deepanjan** | Engineered for Power Users</p>
+
+### 🛠️ Tech Stack
+* **Language:** Kotlin
+* **UI Framework:** Jetpack Compose (Material 3)
+* **Architecture:** MVVM
+
+<p align="center">Developed by **Deepanjan**</p>

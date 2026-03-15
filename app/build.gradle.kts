@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.premiumcalculator"
+    namespace = "com.deepanjan.neocalculator"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.premiumcalculator"
+        applicationId = "com.deepanjan.neocalculator"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

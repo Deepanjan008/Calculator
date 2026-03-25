@@ -1,0 +1,36 @@
+name: Build and Sign APK
+
+on:
+  # অটোমেটিক বিল্ড বন্ধ, এখন শুধু বাটন টিপলে রান হবে
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Decode Keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/release.jks
+
+    - name: Build and Sign APK
+      run: ./gradlew assembleRelease
+      env:
+        NEO_STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+        NEO_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        NEO_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+    - name: Upload Signed APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: Neo-Calculator-Signed
+        path: app/build/outputs/apk/release/*.apk
+

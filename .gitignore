@@ -1,0 +1,29 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/app/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Keystore & Signing Security
+*.jks
+*.keystore
+signing.properties
+# APK and Signatures
+*.apk
+*.idsig
+keystore_base64.txt
+# Extra build and temp files
+compiled_res.flata
+b64_key.txt
+.idea/

@@ -1,0 +1,38 @@
+Neo Calculator is not just a calculator; it is a complete offline toolkit for your daily life. Designed with a "Privacy-First" philosophy, it works flawlessly without Internet permissions.
+
+Why install multiple apps when Neo Calculator does it all?
+
+🌟 **EXCLUSIVE FEATURES:**
+
+🧮 **Advanced Math Engine:**
+- **Equation Solver:** Stuck on a math problem? Solve linear and quadratic equations instantly.
+- **Factorial (!):** Need to calculate 500! or 10,000!? Neo handles massive numbers with ease.
+- **History:** Never lose track of your calculations.
+
+🎨 **Total Customization:**
+- **Theming:** Use any Hex Code to color the app. Dark mode, Light mode, or Purple mode—it's your choice.
+- **Haptic Feedback:** Satisfying vibration on keypress (optional).
+
+🛠️ **PRO TOOLS SUITE:**
+
+📉 **Finance & Shopping:**
+- **Discount & Tax:** Calculate sale prices and taxes in a snap.
+- **Investment:** Plan your future with SIP and ROI calculators.
+- **Unit Price:** Compare product prices to save money.
+- **Fuel Cost:** Estimate travel costs before you start your trip.
+
+🌍 **Converters:**
+- **Land Converter:** specialized tool for converting land area units.
+- **Unit Converter:** All essential units (Length, Mass, Temp, Speed, Time, Pressure, Energy).
+
+❤️ **Personal Utility:**
+- **BMI/Health:** Check your Body Mass Index privately.
+- **Age Calculator:** Calculate your precise age.
+
+🔒 **PRIVACY GUARANTEE:**
+Neo Calculator is open-source and strictly offline.
+- No Internet Permission
+- No Ads
+- No Data Collection
+
+Experience the power of a modern, clean, and fast calculator. Download Neo Calculator today!

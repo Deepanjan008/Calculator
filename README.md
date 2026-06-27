@@ -1,4 +1,4 @@
-<img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" width="40" align="center"> Neo Calculator
+<img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" width="40" align="center"> N Calculator
 
 <p align="left">
   <img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg" alt="License">

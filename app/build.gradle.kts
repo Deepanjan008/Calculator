@@ -21,7 +21,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("release.jks")
+            storeFile = file("nexura_release.jks")
             storePassword = System.getenv("NEO_STORE_PASSWORD")
             keyAlias = System.getenv("NEO_KEY_ALIAS")
             keyPassword = System.getenv("NEO_KEY_PASSWORD")

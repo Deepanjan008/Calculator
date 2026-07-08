@@ -41,7 +41,7 @@ Built with a strong Privacy-First philosophy, Neo Calculator works completely of
 
 🔒 Privacy Guaranteed
 
-- 100% Open Source (GPL-3.0)
+- 100% Open Source (MIT licence)
 - No Internet Permission
 - No Ads
 - No Data Collection

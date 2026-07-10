@@ -108,7 +108,7 @@ pkg install git openjdk-17
 **Step 2: Clone the Repository & Enter Folder**
 ```bash
 cd Calculator
-git clone [https://github.com/Deepanjan008/Calculator.git]
+git clone https://github.com/Deepanjan008/Calculator.git
 ```
 **Step 3: Setup Android SDK**
 *(Ensure Android command-line tools are downloaded and $ANDROID_HOME is properly configured in your Termux environment).*

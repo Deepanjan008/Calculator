@@ -1,23 +1,10 @@
 plugins {
-    id("com.android.application")
-    id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.nexura.application)
+    alias(libs.plugins.nexura.application.compose)
+    alias(libs.plugins.nexura.hilt)
 }
 
 android {
-    namespace = "com.nexuralabs.calculator"
-    compileSdk = 34
-
-    defaultConfig {
-        applicationId = "com.nexuralabs.calculator"
-        minSdk = 26
-        targetSdk = 34
-        versionCode = 5
-        versionName = "1.0.5"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
     signingConfigs {
         create("release") {
             storeFile = file("nexura_release.jks")
@@ -29,67 +16,30 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
         }
-    }
-    buildFeatures {
-        compose = true
-    }
-    
-    // Izzy-র কথামতো dependenciesInfo ব্লকটি মূল android ব্লকের ভেতরে আনা হয়েছে
-    dependenciesInfo {
-        // Disables dependency metadata when building APKs (for IzzyOnDroid/F-Droid)
-        includeInApk = false
-        // Disables dependency metadata when building Android App Bundles (for Google Play)
-        includeInBundle = false
     }
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation(project(":core:data"))
+    implementation(project(":core:ui"))
+    implementation(project(":core:navigation"))
 
-    // Compose BOM 2024.04.01 (ইতোমধ্যে কাজ করছে)
-    implementation(platform("androidx.compose:compose-bom:2024.04.01"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
+    implementation(project(":feature:calculator"))
+    implementation(project(":feature:converter"))
+    implementation(project(":feature:finance"))
+    implementation(project(":feature:tools"))
+    implementation(project(":feature:history"))
+    implementation(project(":feature:settings"))
 
-    // Extended Icons (আগের ফিক্স)
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
 
-    // FIX: Hilt & Dagger Updated to 2.55.0 (Fixes 'dagger.internal.Provider' error)
-    implementation("com.google.dagger:hilt-android:2.55.0")
-    ksp("com.google.dagger:hilt-android-compiler:2.55.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
-
-    // Dagger Core (Explicitly added to prevent missing class error)
-    implementation("com.google.dagger:dagger:2.55.0")
-
-    // DataStore & Navigation
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-
-    // Room Database
-    val roomVersion = "2.6.1"
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-    ksp("androidx.room:room-compiler:$roomVersion")
-
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-}
-
-
-kotlin {
-    jvmToolchain(17)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }

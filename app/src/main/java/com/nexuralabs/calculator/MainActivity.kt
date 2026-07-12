@@ -7,28 +7,28 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.compose.rememberNavController
-import com.nexuralabs.calculator.ui.theme.AppTheme
-import com.nexuralabs.calculator.ui.dataStore
+import com.nexuralabs.calculator.core.data.repository.PreferencesRepository
+import com.nexuralabs.calculator.core.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.map
-
-private val THEME_KEY = stringPreferencesKey("theme")
-private val COLOR_KEY = stringPreferencesKey("theme_color")
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var preferencesRepository: PreferencesRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val context = LocalContext.current
-            val themeMode by context.dataStore.data.map { it[THEME_KEY] ?: "system" }.collectAsState(initial = "system")
-            val colorHex by context.dataStore.data.map { it[COLOR_KEY] ?: "#BB86FC" }.collectAsState(initial = "#BB86FC")
+            val themeMode by preferencesRepository.themeMode.collectAsState(initial = "system")
+            val colorHex by preferencesRepository.themeColorHex.collectAsState(initial = "#BB86FC")
 
             val isDarkTheme = when (themeMode.lowercase()) {
                 "dark" -> true
@@ -36,10 +36,12 @@ class MainActivity : ComponentActivity() {
                 else -> isSystemInDarkTheme()
             }
 
-            // হেক্স কোড থেকে কালার তৈরি (সেফ মেথড)
             val customThemeColor = remember(colorHex) {
-                try { Color(android.graphics.Color.parseColor(colorHex)) } 
-                catch (e: Exception) { Color(0xFFBB86FC) }
+                try {
+                    Color(android.graphics.Color.parseColor(colorHex))
+                } catch (e: Exception) {
+                    Color(0xFFBB86FC)
+                }
             }
 
             AppTheme(darkTheme = isDarkTheme, customColor = customThemeColor) {

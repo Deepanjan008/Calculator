@@ -25,8 +25,19 @@ class PreferencesRepository @Inject constructor(
     val themeMode: Flow<String> = dataStore.data.map { it[Keys.THEME_MODE] ?: "system" }
     val themeColorHex: Flow<String> = dataStore.data.map { it[Keys.THEME_COLOR] ?: "#BB86FC" }
 
-    suspend fun setPrecision(value: Int) = dataStore.edit { it[Keys.PRECISION] = value }
-    suspend fun setHapticEnabled(value: Boolean) = dataStore.edit { it[Keys.HAPTIC] = value }
-    suspend fun setThemeMode(value: String) = dataStore.edit { it[Keys.THEME_MODE] = value }
-    suspend fun setThemeColorHex(value: String) = dataStore.edit { it[Keys.THEME_COLOR] = value }
+    suspend fun setPrecision(value: Int) {
+        dataStore.edit { it[Keys.PRECISION] = value }
+    }
+
+    suspend fun setHapticEnabled(value: Boolean) {
+        dataStore.edit { it[Keys.HAPTIC] = value }
+    }
+
+    suspend fun setThemeMode(value: String) {
+        dataStore.edit { it[Keys.THEME_MODE] = value }
+    }
+
+    suspend fun setThemeColorHex(value: String) {
+        dataStore.edit { it[Keys.THEME_COLOR] = value }
+    }
 }

@@ -1,19 +1,18 @@
 import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByType
 
 class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply("nexura.android.application")
 
-            extensions.configure<ApplicationExtension> {
-                buildFeatures {
-                    compose = true
-                }
+            val extension = extensions.getByType<ApplicationExtension>()
+            extension.buildFeatures {
+                compose = true
             }
-            configureComposeDependencies(this)
+            configureComposeDependencies(extension)
         }
     }
 }

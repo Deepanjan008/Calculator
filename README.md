@@ -1,18 +1,20 @@
 <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" width="40" align="center"> N Calculator
 
 <p align="left">
-  <img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg" alt="License">
-  <img src="https://img.shields.io/badge/Version-1.0.0-orange.svg" alt="Version">
+<img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
+  <img src="https://img.shields.io/badge/Version-1.0.4-orange.svg" alt="Version">
   <img src="https://img.shields.io/badge/UI-Glassmorphism-pink.svg" alt="Design">
   <img src="https://img.shields.io/badge/Language-Kotlin-7F52FF.svg" alt="Language">
-</p>Neo Calculator is more than just a calculator — it’s a complete offline utility toolkit built with a strong focus on privacy, performance, and modern design.
+</p>
+
+Neo Calculator is more than just a calculator — it’s a complete offline utility toolkit built with a strong focus on privacy, performance, and modern design.
 
 No internet. No ads. No tracking.
 Just fast, reliable tools that work entirely on your device.
 
 ---
 
-📱 App Gallery
+## 📱 App Gallery
 
 <div align="center">
   <table>
@@ -23,52 +25,48 @@ Just fast, reliable tools that work entirely on your device.
       <td><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="160"></td>
     </tr>
   </table>
-</div>---
+</div>
 
-✨ Features
+---
 
-🧮 Advanced Calculator
+## ✨ Features
 
+### 🧮 Advanced Calculator
 - High precision arithmetic engine
 - Massive factorial support (up to 10,000!)
 - Scientific notation & large number handling
 - Smart history tracking
 
-🛠️ Utility Tools
+### 🛠️ Utility Tools
 
-💰 Finance
-
+**💰 Finance**
 - Discount & Tax Calculator
 - Investment & SIP Calculator
 - EMI Calculator
 - Fuel Cost Calculator
 - Unit Price Comparison
 
-🌍 Converters
-
+**🌍 Converters**
 - Unit Converter (Length, Weight, Temp, Speed, Time, Data, etc.)
 - Land Converter (Bigha, Acre, Sq.ft, Hectare)
 - Currency Converter (offline with saved rates)
 
-❤️ Personal Tools
-
+**❤️ Personal Tools**
 - BMI Calculator
 - Age Calculator
 - GPA Calculator
 
 ---
 
-🎨 Design
-
+## 🎨 Design
 - Modern Glassmorphism UI
-- Material Design 3
+- Material Design 3 + Adaptive Layouts
 - Smooth animations & transitions
 - Full Dark Mode support
 
 ---
 
-🔒 Privacy First
-
+## 🔒 Privacy First
 - 100% Open Source (MIT)
 - No Internet Permission
 - No Ads
@@ -77,63 +75,82 @@ Just fast, reliable tools that work entirely on your device.
 
 ---
 
-🛠️ Tech Stack
-
-- Language: Kotlin
-- UI: Jetpack Compose + Material 3
-- Architecture: MVVM
+## 🛠️ Tech Stack
+- **Language:** Kotlin (1.9.22)
+- **UI:** Jetpack Compose (BOM 2024.04.01) + Material 3
+- **Architecture:** Modular + Clean Architecture (:app, :core, :features)
+- **Build System:** Gradle (8.x) & AGP (8.x)
 
 ---
 
-📥 Installation
+## 📥 Installation & Build Guide
 
-git clone https://github.com/Deepanjan008/Calculator.git
+You can build this project on a PC or directly on your Android device.
+
+### 🖥️ 1. Build on PC (Windows / macOS / Linux)
+
+| OS | Requirements | Steps to Build |
+|---|---|---|
+| **Windows** | Android Studio, Git, JDK 17+ | `git clone https://github.com/Deepanjan008/Calculator.git` <br> `cd Calculator` <br> Open in Android Studio > Sync Gradle > Press Shift+F10 to Run. |
+| **macOS** | Android Studio, Git, JDK 17+ | `git clone https://github.com/Deepanjan008/Calculator.git` <br> `cd Calculator` <br> Open in Android Studio > Sync Gradle > Press Control+R to Run. |
+| **Linux** | Android Studio, Git, JDK 17+ | `git clone https://github.com/Deepanjan008/Calculator.git` <br> `cd Calculator` <br> Open in Android Studio > Sync Gradle > Press Shift+F10 to Run. |
+
+### 📱 2. Build on Android (via Termux)
+
+You can compile the app entirely on your phone without needing Android Studio.
+
+**Step 1: Install Dependencies**
+```bash
+pkg update && pkg upgrade
+pkg install git openjdk-17
+
+```
+**Step 2: Clone the Repository & Enter Folder**
+```bash
 cd Calculator
+git clone https://github.com/Deepanjan008/Calculator.git
+```
+**Step 3: Setup Android SDK**
+*(Ensure Android command-line tools are downloaded and $ANDROID_HOME is properly configured in your Termux environment).*
+**Step 4: Build the APK**
+```bash
+chmod +x gradlew
+./gradlew assembleDebug
 
-Open in Android Studio, sync Gradle, and run on your device or emulator.
+```
+*Once the build is successful, find the generated APK inside app/build/outputs/apk/debug/ and install it.*
+## ⚠️ Important Note for Release Build
+If you attempt to generate a release build using ./gradlew assembleRelease, the build will **fail**.
+This project uses secure environment variables for signing the release APK. The Keystore file (nexura_release.jks) and the following variables are strictly excluded from this repository for security reasons:
+ * NEO_STORE_PASSWORD
+ * NEO_KEY_ALIAS
+ * NEO_KEY_PASSWORD
+### 🔑 How to Generate Your Own Keystore for Release
+If you want to build a release APK, you must generate your own Keystore file. Run the following command in your terminal (inside the app directory):
+```bash
+keytool -genkey -v -keystore your_own_release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias your_alias_name
 
----
-
-🤝 Contributing
-
+```
+During generation, you will be prompted to enter the following details:
+ * **Enter keystore password:** Type a strong password (e.g., MySecurePass123). *Note: It won't show on the screen as you type.*
+ * **Re-enter new password:** Type the same password again.
+ * **What is your first and last name?** Enter your name or developer name.
+ * **What is the name of your organizational unit?** E.g., Development.
+ * **What is the name of your organization?** E.g., Nexura Labs.
+ * **What is the name of your City or Locality?** E.g., Kolkata.
+ * **What is the name of your State or Province?** E.g., West Bengal.
+ * **What is the two-letter country code for this unit?** E.g., IN (for India).
+ * **Is CN=..., OU=..., O=..., L=..., ST=..., C=IN correct?** Type yes and press Enter.
+**Update app/build.gradle.kts:**
+After generating your_own_release.jks, replace the signingConfigs in app/build.gradle.kts with your new keystore details, or set the environment variables locally on your machine.
+## 🤝 Contributing
 Contributions are welcome!
 Please open an issue first to discuss changes before submitting a PR.
-
----
-
-📄 License
-
+## 📄 License
 Licensed under the MIT License
-
----
-
 <p align="center">
-  <strong>Built with ❤️ for privacy-conscious users</strong>
+<strong>Built with ❤️ for privacy-conscious users</strong>
 </p>
-
----
-
-🏗️ Architecture (v2.0.0)
-
-Restructured into multi-module Clean Architecture, following the same `build-logic` convention-plugin
-pattern as AlphaVisionPro:
-
-```
-Calculator/
-├── build-logic/convention/     # Precompiled convention plugins (application, library, compose, hilt)
-├── app/                        # Thin shell: App, MainActivity, NavGraph aggregator
-├── core/
-│   ├── data/                   # Room DB, DataStore, HistoryRepository, PreferencesRepository, Hilt DI
-│   ├── ui/                     # Shared AppTheme + Typography
-│   └── navigation/             # Shared route constants (NexuraRoutes) + cross-feature result passing
-└── feature/
-    ├── calculator/
-    ├── converter/               # Unit / Land / Currency / Unit-price converters
-    ├── finance/                 # EMI, Investment, Discount/Tax, Fuel cost
-    ├── tools/                   # BMI, Age, GPA, Factorial, Equation solver
-    ├── history/
-    └── settings/
 ```
 
-Feature modules never depend on each other directly - only on `core:navigation`'s route
-constants - so `:app` is the only module that knows every feature exists.
+```

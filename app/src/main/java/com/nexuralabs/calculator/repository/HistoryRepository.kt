@@ -5,7 +5,7 @@ import com.nexuralabs.calculator.data.HistoryEntity
 import javax.inject.Inject
 
 class HistoryRepository @Inject constructor(private val dao: HistoryDao) {
-    suspend fun insert(expression: String, result: String, note: String) {
+    suspend fun insert(expression: String, result: String, note: String = "") {
         dao.insert(HistoryEntity(expression = expression, result = result, note = note))
     }
 
@@ -21,7 +21,7 @@ class HistoryRepository @Inject constructor(private val dao: HistoryDao) {
         dao.clearAll()
     }
 
-    // এই নতুন ফাংশনটি যোগ করা হলো সিঙ্গেল ডিলিটের জন্য!
+    // This new function was added for single deletion!
     suspend fun delete(entity: HistoryEntity) {
         dao.delete(entity)
     }

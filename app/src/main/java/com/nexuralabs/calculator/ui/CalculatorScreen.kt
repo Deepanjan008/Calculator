@@ -39,6 +39,10 @@ fun CalculatorScreen(navController: NavController) {
     val preview by viewModel.preview.collectAsState()
     val hapticEnabled by viewModel.hapticEnabled.collectAsState()
 
+    ObserveHistorySelection(navController) { selectedExpression ->
+        viewModel.loadFromHistory(selectedExpression)
+    }
+
     var showProTools by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
@@ -285,6 +289,30 @@ private fun ProToolCard(tool: ProTool, navController: NavController, onDismiss: 
             Icon(tool.icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(44.dp))
             Spacer(Modifier.height(8.dp))
             Text(tool.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        }
+    }
+}
+
+const val HISTORY_SELECTED_EXPRESSION_KEY = "history_selected_expression"
+
+fun NavController.returnSelectedExpressionToCalculator(expression: String) {
+    previousBackStackEntry
+        ?.savedStateHandle
+        ?.set(HISTORY_SELECTED_EXPRESSION_KEY, expression)
+}
+
+@Composable
+fun ObserveHistorySelection(
+    navController: NavController,
+    onExpressionSelected: (String) -> Unit,
+) {
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val selected = savedStateHandle?.get<String>(HISTORY_SELECTED_EXPRESSION_KEY)
+
+    LaunchedEffect(selected) {
+        if (selected != null) {
+            onExpressionSelected(selected)
+            savedStateHandle.remove<String>(HISTORY_SELECTED_EXPRESSION_KEY)
         }
     }
 }

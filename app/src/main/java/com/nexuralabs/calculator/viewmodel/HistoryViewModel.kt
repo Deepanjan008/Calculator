@@ -15,7 +15,7 @@ class HistoryViewModel @Inject constructor(
     private val repository: HistoryRepository
 ) : ViewModel() {
 
-    // এটাকে MutableState করা হলো যাতে UI আপডেট হতে পারে
+    // Made MutableState so UI updates correctly
     private val _history = mutableStateOf<List<HistoryEntity>>(emptyList())
     val history: State<List<HistoryEntity>> = _history
 
@@ -32,14 +32,14 @@ class HistoryViewModel @Inject constructor(
     fun deleteItem(item: HistoryEntity) {
         viewModelScope.launch { 
             repository.delete(item)
-            loadHistory() // ডিলিট করার পর লিস্ট রিফ্রেশ
+            loadHistory() // Refresh list after deletion
         }
     }
 
     fun clearAll() {
         viewModelScope.launch { 
             repository.clearAll()
-            loadHistory() // ক্লিয়ার করার পর লিস্ট রিফ্রেশ
+            loadHistory() // Refresh list after clearing
         }
     }
 }

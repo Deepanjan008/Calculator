@@ -48,21 +48,21 @@ fun FuelCostScreen(navController: NavController) {
             OutlinedTextField(
                 value = distance, onValueChange = { distance = it; showError = false },
                 label = { Text("Distance (km)") }, isError = showError && distance.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))
             OutlinedTextField(
                 value = fuelPrice, onValueChange = { fuelPrice = it; showError = false },
                 label = { Text("Fuel Price (per liter)") }, isError = showError && fuelPrice.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))
             OutlinedTextField(
                 value = mileage, onValueChange = { mileage = it; showError = false },
                 label = { Text("Mileage (km/liter)") }, isError = showError && mileage.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(32.dp))

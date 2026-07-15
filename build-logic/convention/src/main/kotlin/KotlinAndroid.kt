@@ -9,16 +9,16 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  * and `com.android.library` modules (compileSdk, JVM target, Kotlin compiler options).
  */
 internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
         compileSdk = 35
 
-        defaultConfig {
+        defaultConfig.apply {
             minSdk = 26
         }
 
-        compileOptions {
+        compileOptions.apply {
             sourceCompatibility = JavaVersion.VERSION_17
             targetCompatibility = JavaVersion.VERSION_17
         }

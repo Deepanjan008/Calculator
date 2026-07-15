@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.runtime.Immutable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -35,7 +36,7 @@ fun UnitConverterScreen(navController: NavController) {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(padding).fillMaxSize()
         ) {
-            items(converterCategories) { category ->
+            items(converterCategories, key = { it.name }) { category ->
                 Card(
                     onClick = { navController.navigate(NexuraRoutes.converterDetail(category.name)) },
                     modifier = Modifier.aspectRatio(1f).shadow(4.dp, RoundedCornerShape(28.dp)),
@@ -57,6 +58,7 @@ fun UnitConverterScreen(navController: NavController) {
     }
 }
 
+@Immutable
 data class ConverterCategory(val name: String, val icon: ImageVector)
 
 private val converterCategories = listOf(

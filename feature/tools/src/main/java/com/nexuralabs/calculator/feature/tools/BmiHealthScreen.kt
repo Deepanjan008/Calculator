@@ -51,14 +51,14 @@ fun BmiHealthScreen(navController: NavController) {
             OutlinedTextField(
                 value = weight, onValueChange = { weight = it; showError = false },
                 label = { Text("Weight (kg)") }, isError = showError && weight.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))
             OutlinedTextField(
                 value = height, onValueChange = { height = it; showError = false },
                 label = { Text("Height (cm)") }, isError = showError && height.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))

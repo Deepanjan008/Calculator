@@ -71,7 +71,7 @@ fun GpaCalculatorScreen(navController: NavController) {
                         isError = showError && grades[index].isEmpty(),
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                     Spacer(Modifier.width(12.dp))
                     OutlinedTextField(
@@ -81,7 +81,7 @@ fun GpaCalculatorScreen(navController: NavController) {
                         isError = showError && credits[index].isEmpty(),
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                 }
                 Spacer(Modifier.height(12.dp))
@@ -109,7 +109,7 @@ fun GpaCalculatorScreen(navController: NavController) {
                     if (isValid && totalCredits > 0) {
                         result = String.format("%.2f", totalPoints / totalCredits)
                         showError = false
-                        keyboardController?.hide() // কিবোর্ড হাইড হবে
+                        keyboardController?.hide() // I hide the keyboard here after completing the calculation
                     } else {
                         showError = true
                         result = ""

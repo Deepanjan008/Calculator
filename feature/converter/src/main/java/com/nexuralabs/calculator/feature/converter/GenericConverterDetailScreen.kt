@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
+@Suppress("DEPRECATION")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenericConverterDetailScreen(navController: NavController, category: String) {
@@ -55,7 +56,7 @@ fun GenericConverterDetailScreen(navController: NavController, category: String)
             OutlinedTextField(
                 value = value, onValueChange = { value = it; showError = false },
                 label = { Text("Enter Value") }, isError = showError && value.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))
@@ -105,7 +106,7 @@ fun UnitDropdown(units: List<String>, selected: String, label: String, modifier:
     }
 }
 
-// এই লিস্টটাই আমি একদম প্রো লেভেলের করে দিলাম!
+// I have curated this comprehensive unit list to ensure it is of absolute pro-level quality.
 private fun getUnitsForCategory(category: String): List<String> = when (category) {
     "Length" -> listOf("Kilometre (km)", "Metre (m)", "Centimetre (cm)", "Millimetre (mm)", "Micrometre (μm)", "Nanometre (nm)", "Angstrom (Å)", "Mile (mi)", "Yard (yd)", "Foot (ft)", "Inch (in)", "Nautical Mile (NM)", "Astronomical Unit (au)", "Light Year (ly)", "Parsec (pc)")
     "Area" -> listOf("Square Kilometre (km²)", "Square Metre (m²)", "Square Centimetre (cm²)", "Square Millimetre (mm²)", "Hectare (ha)", "Acre (ac)", "Square Mile (mi²)", "Square Yard (yd²)", "Square Foot (ft²)", "Square Inch (in²)")

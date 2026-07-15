@@ -69,7 +69,7 @@ fun FactorialScreen(navController: NavController) {
                     }
                 },
                 label = { Text("Enter a number (e.g., 100)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 singleLine = true
@@ -135,7 +135,7 @@ fun FactorialScreen(navController: NavController) {
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold
                             )
-                            // এই সেই তোর চাওয়া কপি বাটন
+                            // I have integrated this copy button to allow easy clipboard saving of the factorial result.
                             IconButton(
                                 onClick = {
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -160,7 +160,7 @@ fun FactorialScreen(navController: NavController) {
                             Spacer(Modifier.height(12.dp))
                         }
 
-                        // স্ক্রল করে পুরো বিশাল সংখ্যা দেখার জায়গা
+                        // I have structured this scrollable container to accommodate and display the entire large output value.
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -180,7 +180,7 @@ fun FactorialScreen(navController: NavController) {
     }
 }
 
-// ব্যাকগ্রাউন্ড ইঞ্জিন (যাতে অ্যাপ না আটকে যায়)
+// I have moved the heavy computation of large factorials to a background dispatcher to prevent blocking the UI thread.
 suspend fun calculateFactorial(n: Int): String = withContext(Dispatchers.Default) {
     var result = BigInteger.ONE
     for (i in 2..n) {

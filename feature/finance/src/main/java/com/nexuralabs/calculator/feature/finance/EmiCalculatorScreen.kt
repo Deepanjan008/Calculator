@@ -10,7 +10,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import java.util.Locale
 import kotlin.math.pow
-
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmiCalculatorScreen(navController: NavController) {
@@ -42,18 +43,21 @@ fun EmiCalculatorScreen(navController: NavController) {
                 value = principal,
                 onValueChange = { principal = it },
                 label = { Text("Loan Amount") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = rate,
                 onValueChange = { rate = it },
                 label = { Text("Annual Interest Rate (%)") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = tenure,
                 onValueChange = { tenure = it },
                 label = { Text("Tenure (months)") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
 

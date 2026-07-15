@@ -45,16 +45,16 @@ fun UnitPriceScreen(navController: NavController) {
         ) {
             Text("Product 1", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.Start).padding(top = 16.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(value = p1, onValueChange = { p1 = it; showError = false }, label = { Text("Price") }, isError = showError && p1.isEmpty(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
+                OutlinedTextField(value = p1, onValueChange = { p1 = it; showError = false }, label = { Text("Price") }, isError = showError && p1.isEmpty(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
                 Spacer(Modifier.width(8.dp))
-                OutlinedTextField(value = w1, onValueChange = { w1 = it; showError = false }, label = { Text("Weight") }, isError = showError && w1.isEmpty(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
+                OutlinedTextField(value = w1, onValueChange = { w1 = it; showError = false }, label = { Text("Weight") }, isError = showError && w1.isEmpty(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
             }
             Spacer(Modifier.height(16.dp))
             Text("Product 2", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.Start))
             Row(modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(value = p2, onValueChange = { p2 = it; showError = false }, label = { Text("Price") }, isError = showError && p2.isEmpty(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
+                OutlinedTextField(value = p2, onValueChange = { p2 = it; showError = false }, label = { Text("Price") }, isError = showError && p2.isEmpty(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
                 Spacer(Modifier.width(8.dp))
-                OutlinedTextField(value = w2, onValueChange = { w2 = it; showError = false }, label = { Text("Weight") }, isError = showError && w2.isEmpty(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
+                OutlinedTextField(value = w2, onValueChange = { w2 = it; showError = false }, label = { Text("Weight") }, isError = showError && w2.isEmpty(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
             }
             Spacer(Modifier.height(32.dp))
             Button(

@@ -50,7 +50,7 @@ fun DiscountTaxScreen(navController: NavController) {
             OutlinedTextField(
                 value = originalPrice, onValueChange = { originalPrice = it; showError = false },
                 label = { Text("Original Price") }, isError = showError && originalPrice.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))
@@ -58,14 +58,14 @@ fun DiscountTaxScreen(navController: NavController) {
                 OutlinedTextField(
                     value = discountPercent, onValueChange = { discountPercent = it; showError = false },
                     label = { Text("Discount (%)") }, isError = showError && discountPercent.isEmpty(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp)
                 )
                 Spacer(Modifier.width(12.dp))
                 OutlinedTextField(
                     value = taxPercent, onValueChange = { taxPercent = it; showError = false },
                     label = { Text("Tax (%)") }, isError = showError && taxPercent.isEmpty(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp)
                 )
             }

@@ -2,7 +2,7 @@
 
 <p align="left">
 <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
-  <img src="https://img.shields.io/badge/Version-2.0.0-orange.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Version-1.0.4-orange.svg" alt="Version">
   <img src="https://img.shields.io/badge/UI-Glassmorphism-pink.svg" alt="Design">
   <img src="https://img.shields.io/badge/Language-Kotlin-7F52FF.svg" alt="Language">
 </p>
@@ -76,13 +76,10 @@ Just fast, reliable tools that work entirely on your device.
 ---
 
 ## 🛠️ Tech Stack
-- **Language:** Kotlin (2.3.10)
-- **UI:** Jetpack Compose (BOM 2026.06.01 / Compose 1.11.4) + Material 3
-- **Architecture:** Modular + Clean Architecture:
-  - **`:app`**: Main entry point and orchestration layer.
-  - **`:core`**: Shared modules (`:core:data`, `:core:ui`, `:core:navigation`).
-  - **`:feature`**: Isolated feature modules (`:feature:calculator`, `:feature:converter`, `:feature:finance`, `:feature:tools`, `:feature:history`, `:feature:settings`).
-- **Build System:** Gradle (9.3.1) & AGP (9.0.1)
+- **Language:** Kotlin (1.9.22)
+- **UI:** Jetpack Compose (BOM 2024.04.01) + Material 3
+- **Architecture:** Modular + Clean Architecture (:app, :core, :features)
+- **Build System:** Gradle (8.x) & AGP (8.x)
 
 ---
 
@@ -94,9 +91,9 @@ You can build this project on a PC or directly on your Android device.
 
 | OS | Requirements | Steps to Build |
 |---|---|---|
-| **Windows** | Android Studio, Git, JDK 17+ (JDK 21 recommended) | `git clone https://github.com/Deepanjan008/Calculator.git` <br> `cd Calculator` <br> Open in Android Studio > Sync Gradle > Press Shift+F10 to Run. |
-| **macOS** | Android Studio, Git, JDK 17+ (JDK 21 recommended) | `git clone https://github.com/Deepanjan008/Calculator.git` <br> `cd Calculator` <br> Open in Android Studio > Sync Gradle > Press Control+R to Run. |
-| **Linux** | Android Studio, Git, JDK 17+ (JDK 21 recommended) | `git clone https://github.com/Deepanjan008/Calculator.git` <br> `cd Calculator` <br> Open in Android Studio > Sync Gradle > Press Shift+F10 to Run. |
+| **Windows** | Android Studio, Git, JDK 17+ | `git clone https://github.com/Deepanjan008/Calculator.git` <br> `cd Calculator` <br> Open in Android Studio > Sync Gradle > Press Shift+F10 to Run. |
+| **macOS** | Android Studio, Git, JDK 17+ | `git clone https://github.com/Deepanjan008/Calculator.git` <br> `cd Calculator` <br> Open in Android Studio > Sync Gradle > Press Control+R to Run. |
+| **Linux** | Android Studio, Git, JDK 17+ | `git clone https://github.com/Deepanjan008/Calculator.git` <br> `cd Calculator` <br> Open in Android Studio > Sync Gradle > Press Shift+F10 to Run. |
 
 ### 📱 2. Build on Android (via Termux)
 

@@ -23,22 +23,39 @@ import com.nexuralabs.calculator.core.navigation.NexuraRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UnitConverterScreen(navController: NavController) {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(title = { Text("Unit Converter", fontWeight = FontWeight.Bold) })
+fun UnitConverterScreen(
+    navController: NavController,
+    onDismiss: () -> Unit = { navController.popBackStack() }
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("Unit Converter", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            IconButton(onClick = onDismiss) {
+                Icon(Icons.Default.Close, "Close")
+            }
         }
-    ) { padding ->
+        HorizontalDivider()
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(padding).fillMaxSize()
+            modifier = Modifier.fillMaxWidth()
         ) {
             items(converterCategories, key = { it.name }) { category ->
                 Card(
-                    onClick = { navController.navigate(NexuraRoutes.converterDetail(category.name)) },
+                    onClick = {
+                        onDismiss()
+                        navController.navigate(NexuraRoutes.converterDetail(category.name))
+                    },
                     modifier = Modifier.aspectRatio(1f).shadow(4.dp, RoundedCornerShape(28.dp)),
                     shape = RoundedCornerShape(28.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f))

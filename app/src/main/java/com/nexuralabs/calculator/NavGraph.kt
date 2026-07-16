@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.nexuralabs.calculator.core.navigation.NexuraRoutes
 import com.nexuralabs.calculator.feature.calculator.calculatorScreen
+import com.nexuralabs.calculator.feature.converter.UnitConverterScreen
 import com.nexuralabs.calculator.feature.converter.converterScreens
 import com.nexuralabs.calculator.feature.finance.financeScreens
 import com.nexuralabs.calculator.feature.history.historyScreen
@@ -18,7 +19,15 @@ import com.nexuralabs.calculator.feature.tools.toolsScreens
 @Composable
 fun NavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = NexuraRoutes.CALCULATOR) {
-        calculatorScreen(navController)
+        calculatorScreen(
+            navController = navController,
+            unitConverterSheet = { onDismiss ->
+                UnitConverterScreen(
+                    navController = navController,
+                    onDismiss = onDismiss
+                )
+            }
+        )
         converterScreens(navController)
         financeScreens(navController)
         toolsScreens(navController)

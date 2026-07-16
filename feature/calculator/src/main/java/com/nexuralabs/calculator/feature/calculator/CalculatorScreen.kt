@@ -35,7 +35,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun CalculatorScreen(navController: NavController) {
+fun CalculatorScreen(
+    navController: NavController,
+    unitConverterSheet: @Composable ((onDismiss: () -> Unit) -> Unit)? = null
+) {
     val viewModel: CalculatorViewModel = hiltViewModel()
     val context = LocalContext.current
     val expression by viewModel.expression.collectAsState()
@@ -53,6 +56,9 @@ fun CalculatorScreen(navController: NavController) {
     var showProTools by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
+
+    var showUnitConverter by remember { mutableStateOf(false) }
+    val unitConverterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val previewFontSize = when {
         preview.length <= 7 -> 72.sp
@@ -83,6 +89,16 @@ fun CalculatorScreen(navController: NavController) {
                     items(proTools, key = { it.title }) { tool -> ProToolCard(tool, navController) { showProTools = false } }
                 }
             }
+        }
+    }
+
+    if (showUnitConverter && unitConverterSheet != null) {
+        ModalBottomSheet(
+            onDismissRequest = { showUnitConverter = false },
+            sheetState = unitConverterSheetState,
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+        ) {
+            unitConverterSheet { showUnitConverter = false }
         }
     }
 
@@ -120,7 +136,13 @@ fun CalculatorScreen(navController: NavController) {
                             .padding(horizontal = 8.dp)
                             .size(28.dp)
                             .combinedClickable(
-                                onClick = { navController.navigate(NexuraRoutes.UNIT_CONVERTER) },
+                                onClick = {
+                                    if (unitConverterSheet != null) {
+                                        showUnitConverter = true
+                                    } else {
+                                        navController.navigate(NexuraRoutes.UNIT_CONVERTER)
+                                    }
+                                },
                                 onLongClick = { Toast.makeText(context, "Unit Converter", Toast.LENGTH_SHORT).show() }
                             )
                     )

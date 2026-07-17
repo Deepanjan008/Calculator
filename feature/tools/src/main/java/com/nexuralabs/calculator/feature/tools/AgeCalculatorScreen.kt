@@ -160,26 +160,44 @@ fun AgeCalculatorScreen(navController: NavController) {
 
             if (birthDateTime != null) {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight(),
                     shape = RoundedCornerShape(28.dp),
                     elevation = CardDefaults.cardElevation(8.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp).fillMaxWidth(),
+                        modifier = Modifier.padding(24.dp).fillMaxWidth().wrapContentHeight(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        val yearsText = "$years Years"
+                        val yearsFontSize = when {
+                            yearsText.length <= 10 -> 36.sp
+                            yearsText.length <= 16 -> 26.sp
+                            else -> 18.sp
+                        }
                         Text(
-                            "$years Years",
-                            fontSize = 36.sp,
+                            text = yearsText,
+                            fontSize = yearsFontSize,
                             fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
+                        Spacer(Modifier.height(4.dp))
+                        
+                        val daysText = "$months Months, $days Days"
+                        val daysFontSize = when {
+                            daysText.length <= 18 -> 22.sp
+                            daysText.length <= 26 -> 18.sp
+                            else -> 14.sp
+                        }
                         Text(
-                            "$months Months, $days Days",
-                            fontSize = 22.sp,
+                            text = daysText,
+                            fontSize = daysFontSize,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                         
                         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
@@ -187,13 +205,23 @@ fun AgeCalculatorScreen(navController: NavController) {
                         Text(
                             "Live Ticking",
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                            modifier = Modifier.wrapContentHeight(),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
+                        Spacer(Modifier.height(4.dp))
+                        val tickingText = "${String.format("%02d", hours)}h : ${String.format("%02d", minutes)}m : ${String.format("%02d", seconds)}s"
+                        val tickingFontSize = when {
+                            tickingText.length <= 16 -> 28.sp
+                            else -> 20.sp
+                        }
                         Text(
-                            "${String.format("%02d", hours)}h : ${String.format("%02d", minutes)}m : ${String.format("%02d", seconds)}s",
-                            fontSize = 28.sp,
+                            text = tickingText,
+                            fontSize = tickingFontSize,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                     }
                 }

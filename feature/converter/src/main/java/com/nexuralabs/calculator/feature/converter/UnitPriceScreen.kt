@@ -71,8 +71,24 @@ fun UnitPriceScreen(navController: NavController) {
 
             if (resultText.isNotEmpty()) {
                 Spacer(Modifier.height(32.dp))
-                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                    Text(text = resultText, modifier = Modifier.padding(24.dp).fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Card(
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    val fontSize = when {
+                        resultText.length <= 15 -> 22.sp
+                        resultText.length <= 25 -> 18.sp
+                        else -> 14.sp
+                    }
+                    Text(
+                        text = resultText,
+                        modifier = Modifier.padding(24.dp).fillMaxWidth().wrapContentHeight(),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        fontSize = fontSize,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }

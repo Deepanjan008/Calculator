@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -119,23 +120,28 @@ fun FactorialScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
+                        .wrapContentHeight()
                         .padding(bottom = 16.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(
+                        modifier = Modifier.padding(24.dp).fillMaxWidth().wrapContentHeight(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            Spacer(Modifier.width(48.dp))
                             Text(
                                 "Result", 
-                                style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.wrapContentHeight(),
+                                textAlign = TextAlign.Center
                             )
-                            // I have integrated this copy button to allow easy clipboard saving of the factorial result.
                             IconButton(
                                 onClick = {
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -148,29 +154,41 @@ fun FactorialScreen(navController: NavController) {
                             }
                         }
                         
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.primary.copy(0.1f))
 
                         if (scientificResult.isNotEmpty()) {
                             Text(
                                 text = "Approx: $scientificResult",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
-                                color = MaterialTheme.colorScheme.secondary
+                                color = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                                textAlign = TextAlign.Center
                             )
                             Spacer(Modifier.height(12.dp))
                         }
 
-                        // I have structured this scrollable container to accommodate and display the entire large output value.
+                        val fontSize = when {
+                            fullResult.length <= 10 -> 36.sp
+                            fullResult.length <= 16 -> 26.sp
+                            fullResult.length <= 22 -> 20.sp
+                            else -> 16.sp
+                        }
+
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .wrapContentHeight()
                                 .verticalScroll(rememberScrollState())
                         ) {
                             Text(
                                 text = fullResult,
-                                fontSize = 16.sp,
-                                lineHeight = 24.sp,
-                                style = MaterialTheme.typography.bodyLarge
+                                fontSize = fontSize,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                                textAlign = TextAlign.Center
                             )
                         }
                     }

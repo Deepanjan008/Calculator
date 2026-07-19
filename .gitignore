@@ -26,6 +26,7 @@ keystore_base64.txt
 # Extra build and temp files
 compiled_res.flata
 b64_key.txt
+build_run_log.txt
 .idea/
 
 # Generated Artifacts and APKs

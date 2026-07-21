@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
@@ -221,9 +223,9 @@ fun FactorialScreen(navController: NavController) {
                             else -> 11.sp
                         }
 
-                        // ছোট রেজাল্ট (< 5000 digit) হলে single Text, বড় হলে
-                        // virtualized LazyColumn — non-virtualized single Text দিয়ে
-                        // ~450K digit রেন্ডার করলে UI জ্যাংক/ANR হওয়ার ঝুঁকি থাকে
+                        // Small results (< 5000 digits) use a single Text; large
+                        // results use a virtualized LazyColumn — rendering ~450K
+                        // digits in a single non-virtualized Text risks UI jank/ANR
                         val singleTextThreshold = 5000
 
                         if (fullResult.length <= singleTextThreshold) {
@@ -300,6 +302,10 @@ suspend fun calculateFactorialFast(n: Int): String = withContext(Dispatchers.Def
     if (n == 0 || n == 1) return@withContext "1"
 
     fun treeProduct(left: Int, right: Int): BigInteger {
+        // Cooperative cancellation check on every split, so a long-running
+        // recursion (e.g. n=100000) stops promptly if the composable is
+        // disposed, instead of wasting CPU/battery in the background
+        currentCoroutineContext().ensureActive()
         return when {
             left > right -> BigInteger.ONE
             left == right -> BigInteger.valueOf(left.toLong())

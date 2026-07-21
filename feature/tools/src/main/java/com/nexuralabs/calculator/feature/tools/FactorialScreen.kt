@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,7 +45,7 @@ fun FactorialScreen(navController: NavController) {
 
     val displayChunks = remember(fullResult) {
         if (fullResult.isEmpty()) emptyList()
-        else if (fullResult.length > 2000) fullResult.chunked(1000)
+        else if (fullResult.length > 1000) fullResult.chunked(500)
         else listOf(fullResult)
     }
 
@@ -99,6 +100,9 @@ fun FactorialScreen(navController: NavController) {
                     keyboardController?.hide()
                     val n = input.toIntOrNull()
 
+                    fullResult = ""
+                    scientificResult = ""
+
                     when {
                         input.isEmpty() -> {
                             errorMessage = "Input cannot be empty"
@@ -115,8 +119,6 @@ fun FactorialScreen(navController: NavController) {
                     }
 
                     errorMessage = null
-                    fullResult = ""
-                    scientificResult = ""
                     isCalculating = true
 
                     scope.launch {
@@ -124,6 +126,8 @@ fun FactorialScreen(navController: NavController) {
                             val res = calculateFactorialFast(n)
                             fullResult = res
                             scientificResult = formatScientific(res)
+                        } catch (e: CancellationException) {
+                            throw e
                         } catch (e: Exception) {
                             errorMessage = e.localizedMessage ?: "Calculation failed"
                         } finally {

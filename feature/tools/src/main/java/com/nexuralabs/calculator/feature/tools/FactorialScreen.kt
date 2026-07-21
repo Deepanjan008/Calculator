@@ -5,24 +5,27 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,6 +38,7 @@ fun FactorialScreen(navController: NavController) {
     var fullResult by remember { mutableStateOf("") }
     var scientificResult by remember { mutableStateOf("") }
     var isCalculating by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -63,50 +67,85 @@ fun FactorialScreen(navController: NavController) {
 
             OutlinedTextField(
                 value = input,
-                onValueChange = { 
-                    if (it.isEmpty() || it.all { char -> char.isDigit() }) {
-                        input = it 
+                onValueChange = { newValue ->
+                    if (newValue.isEmpty() || (newValue.all { it.isDigit() } && newValue.length <= 7)) {
+                        input = newValue
+                        errorMessage = ""
                     }
                 },
-                label = { Text("Enter a number (e.g., 100)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                label = { Text("Enter a number (Max 100,000)") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                singleLine = true
+                singleLine = true,
+                isError = errorMessage.isNotEmpty(),
+                supportingText = if (errorMessage.isNotEmpty()) {
+                    { Text(errorMessage, color = MaterialTheme.colorScheme.error) }
+                } else null
             )
 
             Spacer(Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    val n = input.toIntOrNull()
-                    if (n != null && n >= 0) {
-                        if (n > 10000) {
-                            Toast.makeText(context, "Number too large! Max 10000", Toast.LENGTH_SHORT).show()
-                            return@Button
+                    when {
+                        input.isEmpty() -> {
+                            errorMessage = "Enter a positive number"
+                            fullResult = ""
+                            scientificResult = ""
                         }
-                        keyboardController?.hide()
-                        isCalculating = true
-                        scope.launch {
-                            val res = calculateFactorial(n)
-                            fullResult = res
-                            scientificResult = if (res.length > 20) {
-                                "${res[0]}.${res.substring(1, 4)}e+${res.length - 1}"
-                            } else {
-                                ""
+                        input.toIntOrNull() == null -> {
+                            errorMessage = "Invalid input"
+                            fullResult = ""
+                            scientificResult = ""
+                        }
+                        input.toInt() < 0 -> {
+                            errorMessage = "Number must be non-negative"
+                            fullResult = ""
+                            scientificResult = ""
+                        }
+                        input.toInt() > 100000 -> {
+                            errorMessage = "Number exceeds limit (max 100,000)"
+                            fullResult = ""
+                            scientificResult = ""
+                        }
+                        else -> {
+                            val n = input.toInt()
+                            keyboardController?.hide()
+                            isCalculating = true
+                            errorMessage = ""
+                            fullResult = ""
+                            scientificResult = ""
+
+                            scope.launch {
+                                try {
+                                    val result = calculateFactorialFast(n)
+                                    fullResult = result
+                                    scientificResult = formatScientific(result)
+                                } catch (e: CancellationException) {
+                                    throw e
+                                } catch (e: Exception) {
+                                    errorMessage = "Calculation error: ${e.message}"
+                                    fullResult = ""
+                                    scientificResult = ""
+                                } finally {
+                                    isCalculating = false
+                                }
                             }
-                            isCalculating = false
                         }
-                    } else {
-                        Toast.makeText(context, "Enter a valid positive number", Toast.LENGTH_SHORT).show()
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 enabled = !isCalculating
             ) {
                 if (isCalculating) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 } else {
                     Text("Calculate (!)", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
@@ -120,58 +159,126 @@ fun FactorialScreen(navController: NavController) {
                         .fillMaxWidth()
                         .weight(1f)
                         .padding(bottom = 16.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .padding(24.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                "Result", 
-                                style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.primary,
+                                "Result",
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
-                            // এই সেই তোর চাওয়া কপি বাটন
+                            Spacer(Modifier.width(12.dp))
                             IconButton(
                                 onClick = {
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                     val clip = ClipData.newPlainText("Factorial Result", fullResult)
                                     clipboard.setPrimaryClip(clip)
                                     Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show()
-                                }
+                                },
+                                modifier = Modifier.size(32.dp)
                             ) {
-                                Icon(Icons.Default.ContentCopy, "Copy", tint = MaterialTheme.colorScheme.primary)
+                                Icon(
+                                    Icons.Default.ContentCopy,
+                                    "Copy",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
                             }
                         }
-                        
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 12.dp),
+                            color = MaterialTheme.colorScheme.primary.copy(0.1f)
+                        )
 
                         if (scientificResult.isNotEmpty()) {
                             Text(
-                                text = "Approx: $scientificResult",
+                                text = scientificResult,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                color = MaterialTheme.colorScheme.secondary
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.secondary,
+                                textAlign = TextAlign.Center
                             )
                             Spacer(Modifier.height(12.dp))
                         }
 
-                        // স্ক্রল করে পুরো বিশাল সংখ্যা দেখার জায়গা
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            Text(
-                                text = fullResult,
-                                fontSize = 16.sp,
-                                lineHeight = 24.sp,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
+                        val fontSize = when {
+                            fullResult.length <= 10 -> 32.sp
+                            fullResult.length <= 16 -> 24.sp
+                            fullResult.length <= 50 -> 18.sp
+                            fullResult.length <= 500 -> 13.sp
+                            else -> 11.sp
+                        }
+
+                        // ছোট রেজাল্ট (< 5000 digit) হলে single Text, বড় হলে
+                        // virtualized LazyColumn — non-virtualized single Text দিয়ে
+                        // ~450K digit রেন্ডার করলে UI জ্যাংক/ANR হওয়ার ঝুঁকি থাকে
+                        val singleTextThreshold = 5000
+
+                        if (fullResult.length <= singleTextThreshold) {
+                            SelectionContainer(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            ) {
+                                Text(
+                                    text = fullResult,
+                                    fontSize = fontSize,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 4.dp),
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = (fontSize.value * 1.25).sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    softWrap = true
+                                )
+                            }
+                        } else {
+                            val chunkSize = 2000
+                            val displayChunks = remember(fullResult) {
+                                fullResult.chunked(chunkSize)
+                            }
+
+                            SelectionContainer(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            ) {
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .fillMaxHeight()
+                                ) {
+                                    items(displayChunks) { chunk ->
+                                        Text(
+                                            text = chunk,
+                                            fontSize = fontSize,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 4.dp),
+                                            textAlign = TextAlign.Center,
+                                            lineHeight = (fontSize.value * 1.25).sp,
+                                            fontFamily = FontFamily.Monospace,
+                                            softWrap = true
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -180,11 +287,29 @@ fun FactorialScreen(navController: NavController) {
     }
 }
 
-// ব্যাকগ্রাউন্ড ইঞ্জিন (যাতে অ্যাপ না আটকে যায়)
-suspend fun calculateFactorial(n: Int): String = withContext(Dispatchers.Default) {
-    var result = BigInteger.ONE
-    for (i in 2..n) {
-        result *= BigInteger.valueOf(i.toLong())
+private fun formatScientific(result: String): String {
+    return if (result.length > 20) {
+        val exponent = result.length - 1
+        val mantissa = "${result[0]}.${result.substring(1, minOf(4, result.length))}"
+        "≈ $mantissa × 10^$exponent"
+    } else ""
+}
+
+suspend fun calculateFactorialFast(n: Int): String = withContext(Dispatchers.Default) {
+    if (n < 0) return@withContext "0"
+    if (n == 0 || n == 1) return@withContext "1"
+
+    fun treeProduct(left: Int, right: Int): BigInteger {
+        return when {
+            left > right -> BigInteger.ONE
+            left == right -> BigInteger.valueOf(left.toLong())
+            right - left == 1 -> BigInteger.valueOf(left.toLong() * right.toLong())
+            else -> {
+                val mid = (left + right) / 2
+                treeProduct(left, mid) * treeProduct(mid + 1, right)
+            }
+        }
     }
-    result.toString()
+
+    treeProduct(2, n).toString()
 }

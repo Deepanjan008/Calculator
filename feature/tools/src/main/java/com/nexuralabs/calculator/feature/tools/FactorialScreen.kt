@@ -67,9 +67,11 @@ fun FactorialScreen(navController: NavController) {
             OutlinedTextField(
                 value = input,
                 onValueChange = { newValue ->
-                    if (newValue.isEmpty() || (newValue.all { it.isDigit() } && newValue.length <= 7)) {
+                    if (newValue.isEmpty() || (newValue.all { it.isDigit() } && newValue.length <= 6)) {
                         input = newValue
                         errorMessage = ""
+                        fullResult = ""
+                        scientificResult = ""
                     }
                 },
                 label = { Text("Enter a number (Max 100,000)") },

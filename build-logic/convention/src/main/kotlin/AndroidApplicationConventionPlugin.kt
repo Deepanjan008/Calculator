@@ -8,7 +8,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("com.android.application")
-                apply("org.jetbrains.kotlin.android")
             }
 
             extensions.configure<ApplicationExtension> {
@@ -17,8 +16,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 defaultConfig {
                     applicationId = "com.nexuralabs.calculator"
                     targetSdk = 35
-                    versionCode = 4
-                    versionName = "2.0.0"
+                    versionCode = 6
+                    versionName = "2.0.2"
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 }
 

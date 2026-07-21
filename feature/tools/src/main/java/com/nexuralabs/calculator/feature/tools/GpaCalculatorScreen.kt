@@ -71,7 +71,7 @@ fun GpaCalculatorScreen(navController: NavController) {
                         isError = showError && grades[index].isEmpty(),
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                     Spacer(Modifier.width(12.dp))
                     OutlinedTextField(
@@ -81,7 +81,7 @@ fun GpaCalculatorScreen(navController: NavController) {
                         isError = showError && credits[index].isEmpty(),
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                 }
                 Spacer(Modifier.height(12.dp))
@@ -109,7 +109,7 @@ fun GpaCalculatorScreen(navController: NavController) {
                     if (isValid && totalCredits > 0) {
                         result = String.format("%.2f", totalPoints / totalCredits)
                         showError = false
-                        keyboardController?.hide() // কিবোর্ড হাইড হবে
+                        keyboardController?.hide() // I hide the keyboard here after completing the calculation
                     } else {
                         showError = true
                         result = ""
@@ -124,13 +124,30 @@ fun GpaCalculatorScreen(navController: NavController) {
             if (result.isNotEmpty()) {
                 Spacer(Modifier.height(32.dp))
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight(),
                     shape = RoundedCornerShape(28.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
-                    Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        modifier = Modifier.padding(24.dp).fillMaxWidth().wrapContentHeight(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text("Your GPA Result", style = MaterialTheme.typography.titleMedium)
-                        Text(text = result, fontSize = 48.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                        Spacer(Modifier.height(8.dp))
+                        val fontSize = when {
+                            result.length <= 6 -> 48.sp
+                            result.length <= 12 -> 34.sp
+                            result.length <= 18 -> 24.sp
+                            else -> 16.sp
+                        }
+                        Text(
+                            text = result,
+                            fontSize = fontSize,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }

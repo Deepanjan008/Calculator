@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -52,7 +53,7 @@ fun CurrencyScreen(navController: NavController) {
                 onValueChange = { amount = it; showError = false },
                 label = { Text("Amount to Convert") },
                 isError = showError && amount.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp)
             )
@@ -62,7 +63,7 @@ fun CurrencyScreen(navController: NavController) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 var expFrom by remember { mutableStateOf(false) }
                 ExposedDropdownMenuBox(expanded = expFrom, onExpandedChange = { expFrom = !expFrom }, modifier = Modifier.weight(1f)) {
-                    OutlinedTextField(value = fromCurrency, onValueChange = {}, readOnly = true, label = { Text("From") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expFrom) }, modifier = Modifier.menuAnchor(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(value = fromCurrency, onValueChange = {}, readOnly = true, label = { Text("From") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expFrom) }, modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true), shape = RoundedCornerShape(12.dp))
                     ExposedDropdownMenu(expanded = expFrom, onDismissRequest = { expFrom = false }) {
                         currencies.forEach { c -> DropdownMenuItem(text = { Text(c) }, onClick = { fromCurrency = c; expFrom = false }) }
                     }
@@ -70,7 +71,7 @@ fun CurrencyScreen(navController: NavController) {
                 Spacer(Modifier.width(12.dp))
                 var expTo by remember { mutableStateOf(false) }
                 ExposedDropdownMenuBox(expanded = expTo, onExpandedChange = { expTo = !expTo }, modifier = Modifier.weight(1f)) {
-                    OutlinedTextField(value = toCurrency, onValueChange = {}, readOnly = true, label = { Text("To") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expTo) }, modifier = Modifier.menuAnchor(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(value = toCurrency, onValueChange = {}, readOnly = true, label = { Text("To") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expTo) }, modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true), shape = RoundedCornerShape(12.dp))
                     ExposedDropdownMenu(expanded = expTo, onDismissRequest = { expTo = false }) {
                         currencies.forEach { c -> DropdownMenuItem(text = { Text(c) }, onClick = { toCurrency = c; expTo = false }) }
                     }
@@ -97,10 +98,31 @@ fun CurrencyScreen(navController: NavController) {
 
             if (result.isNotEmpty()) {
                 Spacer(Modifier.height(40.dp))
-                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                    Column(modifier = Modifier.padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(32.dp).fillMaxWidth().wrapContentHeight(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text("Converted Amount", style = MaterialTheme.typography.titleMedium)
-                        Text(text = result, fontSize = 36.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                        Spacer(Modifier.height(8.dp))
+                        val fontSize = when {
+                            result.length <= 10 -> 36.sp
+                            result.length <= 16 -> 26.sp
+                            result.length <= 22 -> 20.sp
+                            else -> 16.sp
+                        }
+                        Text(
+                            text = result,
+                            fontSize = fontSize,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }

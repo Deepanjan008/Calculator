@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -53,27 +54,27 @@ fun InvestmentScreen(navController: NavController) {
             OutlinedTextField(
                 value = principal, onValueChange = { principal = it; showError = false },
                 label = { Text("Principal Amount") }, isError = showError && principal.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))
             OutlinedTextField(
                 value = rate, onValueChange = { rate = it; showError = false },
                 label = { Text("Annual Interest Rate (%)") }, isError = showError && rate.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))
             OutlinedTextField(
                 value = time, onValueChange = { time = it; showError = false },
                 label = { Text("Time (years)") }, isError = showError && time.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))
             var exp by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(expanded = exp, onExpandedChange = { exp = !exp }) {
-                OutlinedTextField(value = frequency, onValueChange = {}, readOnly = true, label = { Text("Compounding Frequency") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(exp) }, modifier = Modifier.fillMaxWidth().menuAnchor(), shape = RoundedCornerShape(16.dp))
+                OutlinedTextField(value = frequency, onValueChange = {}, readOnly = true, label = { Text("Compounding Frequency") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(exp) }, modifier = Modifier.fillMaxWidth().menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true), shape = RoundedCornerShape(16.dp))
                 ExposedDropdownMenu(expanded = exp, onDismissRequest = { exp = false }) {
                     frequencies.forEach { f -> DropdownMenuItem(text = { Text(f) }, onClick = { frequency = f; exp = false }) }
                 }
@@ -95,12 +96,38 @@ fun InvestmentScreen(navController: NavController) {
 
             if (resultAmount.isNotEmpty()) {
                 Spacer(Modifier.height(32.dp))
-                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                    Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp).fillMaxWidth().wrapContentHeight(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text("Maturity Value", style = MaterialTheme.typography.titleMedium)
-                        Text(text = resultAmount, fontSize = 38.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.height(8.dp))
-                        Text(text = "Interest Earned: $resultInterest", style = MaterialTheme.typography.bodyLarge)
+                        val fontSize = when {
+                            resultAmount.length <= 8 -> 38.sp
+                            resultAmount.length <= 14 -> 28.sp
+                            resultAmount.length <= 20 -> 20.sp
+                            else -> 16.sp
+                        }
+                        Text(
+                            text = resultAmount,
+                            fontSize = fontSize,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = "Interest Earned: $resultInterest",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }

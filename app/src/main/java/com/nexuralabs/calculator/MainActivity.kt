@@ -2,7 +2,9 @@ package com.nexuralabs.calculator
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +37,19 @@ class MainActivity : ComponentActivity() {
                 "light" -> false
                 else -> isSystemInDarkTheme()
             }
+
+            enableEdgeToEdge(
+                statusBarStyle = SystemBarStyle.auto(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT,
+                    detectDarkMode = { isDarkTheme }
+                ),
+                navigationBarStyle = SystemBarStyle.auto(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT,
+                    detectDarkMode = { isDarkTheme }
+                )
+            )
 
             val customThemeColor = remember(colorHex) {
                 try {

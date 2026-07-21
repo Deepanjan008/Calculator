@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -51,14 +52,14 @@ fun LandConverterScreen(navController: NavController) {
             OutlinedTextField(
                 value = inputValue, onValueChange = { inputValue = it; showError = false },
                 label = { Text("Value to Convert") }, isError = showError && inputValue.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(20.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
                 var expFrom by remember { mutableStateOf(false) }
                 ExposedDropdownMenuBox(expanded = expFrom, onExpandedChange = { expFrom = !expFrom }, modifier = Modifier.weight(1f)) {
-                    OutlinedTextField(value = fromUnit, onValueChange = {}, readOnly = true, label = { Text("From") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expFrom) }, modifier = Modifier.menuAnchor(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(value = fromUnit, onValueChange = {}, readOnly = true, label = { Text("From") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expFrom) }, modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true), shape = RoundedCornerShape(12.dp))
                     ExposedDropdownMenu(expanded = expFrom, onDismissRequest = { expFrom = false }) {
                         units.forEach { u -> DropdownMenuItem(text = { Text(u) }, onClick = { fromUnit = u; expFrom = false }) }
                     }
@@ -66,7 +67,7 @@ fun LandConverterScreen(navController: NavController) {
                 Spacer(Modifier.width(12.dp))
                 var expTo by remember { mutableStateOf(false) }
                 ExposedDropdownMenuBox(expanded = expTo, onExpandedChange = { expTo = !expTo }, modifier = Modifier.weight(1f)) {
-                    OutlinedTextField(value = toUnit, onValueChange = {}, readOnly = true, label = { Text("To") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expTo) }, modifier = Modifier.menuAnchor(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(value = toUnit, onValueChange = {}, readOnly = true, label = { Text("To") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expTo) }, modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true), shape = RoundedCornerShape(12.dp))
                     ExposedDropdownMenu(expanded = expTo, onDismissRequest = { expTo = false }) {
                         units.forEach { u -> DropdownMenuItem(text = { Text(u) }, onClick = { toUnit = u; expTo = false }) }
                     }
@@ -88,10 +89,31 @@ fun LandConverterScreen(navController: NavController) {
 
             if (resultText.isNotEmpty()) {
                 Spacer(Modifier.height(40.dp))
-                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                    Column(modifier = Modifier.padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(32.dp).fillMaxWidth().wrapContentHeight(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text("Converted Area", style = MaterialTheme.typography.titleMedium)
-                        Text(text = resultText, fontSize = 36.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                        Spacer(Modifier.height(8.dp))
+                        val fontSize = when {
+                            resultText.length <= 10 -> 36.sp
+                            resultText.length <= 16 -> 26.sp
+                            resultText.length <= 22 -> 20.sp
+                            else -> 16.sp
+                        }
+                        Text(
+                            text = resultText,
+                            fontSize = fontSize,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }

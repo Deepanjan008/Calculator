@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -48,21 +49,21 @@ fun FuelCostScreen(navController: NavController) {
             OutlinedTextField(
                 value = distance, onValueChange = { distance = it; showError = false },
                 label = { Text("Distance (km)") }, isError = showError && distance.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))
             OutlinedTextField(
                 value = fuelPrice, onValueChange = { fuelPrice = it; showError = false },
                 label = { Text("Fuel Price (per liter)") }, isError = showError && fuelPrice.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))
             OutlinedTextField(
                 value = mileage, onValueChange = { mileage = it; showError = false },
                 label = { Text("Mileage (km/liter)") }, isError = showError && mileage.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(32.dp))
@@ -80,12 +81,38 @@ fun FuelCostScreen(navController: NavController) {
 
             if (resultCost.isNotEmpty()) {
                 Spacer(Modifier.height(40.dp))
-                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                    Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp).fillMaxWidth().wrapContentHeight(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text("Total Estimated Cost", style = MaterialTheme.typography.titleMedium)
-                        Text(text = resultCost, fontSize = 42.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.height(8.dp))
-                        Text(text = "Fuel Required: $resultFuel", style = MaterialTheme.typography.bodyLarge)
+                        val fontSize = when {
+                            resultCost.length <= 8 -> 42.sp
+                            resultCost.length <= 14 -> 30.sp
+                            resultCost.length <= 20 -> 22.sp
+                            else -> 16.sp
+                        }
+                        Text(
+                            text = resultCost,
+                            fontSize = fontSize,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = "Fuel Required: $resultFuel",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }

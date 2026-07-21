@@ -15,7 +15,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.Immutable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.nexuralabs.calculator.core.navigation.NexuraRoutes
 import com.nexuralabs.calculator.core.navigation.ObserveHistorySelection
@@ -33,7 +35,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun CalculatorScreen(navController: NavController) {
+fun CalculatorScreen(
+    navController: NavController,
+    unitConverterSheet: @Composable ((onDismiss: () -> Unit) -> Unit)? = null
+) {
     val viewModel: CalculatorViewModel = hiltViewModel()
     val context = LocalContext.current
     val expression by viewModel.expression.collectAsState()
@@ -51,6 +56,9 @@ fun CalculatorScreen(navController: NavController) {
     var showProTools by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
+
+    var showUnitConverter by remember { mutableStateOf(false) }
+    val unitConverterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val previewFontSize = when {
         preview.length <= 7 -> 72.sp
@@ -78,9 +86,19 @@ fun CalculatorScreen(navController: NavController) {
                 }
                 HorizontalDivider()
                 LazyVerticalGrid(columns = GridCells.Fixed(2), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    items(proTools) { tool -> ProToolCard(tool, navController) { showProTools = false } }
+                    items(proTools, key = { it.title }) { tool -> ProToolCard(tool, navController) { showProTools = false } }
                 }
             }
+        }
+    }
+
+    if (showUnitConverter && unitConverterSheet != null) {
+        ModalBottomSheet(
+            onDismissRequest = { showUnitConverter = false },
+            sheetState = unitConverterSheetState,
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+        ) {
+            unitConverterSheet { showUnitConverter = false }
         }
     }
 
@@ -118,7 +136,13 @@ fun CalculatorScreen(navController: NavController) {
                             .padding(horizontal = 8.dp)
                             .size(28.dp)
                             .combinedClickable(
-                                onClick = { navController.navigate(NexuraRoutes.UNIT_CONVERTER) },
+                                onClick = {
+                                    if (unitConverterSheet != null) {
+                                        showUnitConverter = true
+                                    } else {
+                                        navController.navigate(NexuraRoutes.UNIT_CONVERTER)
+                                    }
+                                },
                                 onLongClick = { Toast.makeText(context, "Unit Converter", Toast.LENGTH_SHORT).show() }
                             )
                     )
@@ -165,7 +189,7 @@ fun CalculatorScreen(navController: NavController) {
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        items(keypadButtons) { btn ->
+                        items(keypadButtons, key = { it.display }) { btn ->
                             KeypadButton(btn) { handleButtonClick(btn, hapticEnabled, context, viewModel) }
                         }
                     }
@@ -187,7 +211,7 @@ fun CalculatorScreen(navController: NavController) {
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.weight(3.8f)
                     ) {
-                        items(keypadButtons) { btn ->
+                        items(keypadButtons, key = { it.display }) { btn ->
                             KeypadButton(btn) { handleButtonClick(btn, hapticEnabled, context, viewModel) }
                         }
                     }
@@ -228,10 +252,15 @@ private fun DisplaySection(
     )
 }
 
+@android.annotation.SuppressLint("MissingPermission")
 private fun handleButtonClick(btn: KeypadButton, hapticEnabled: Boolean, context: Context, viewModel: CalculatorViewModel) {
     if (hapticEnabled) {
-        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        vibrator?.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
+        val vibrator = context.getSystemService(Vibrator::class.java)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            vibrator?.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
+        } else {
+            vibrator?.vibrate(VibrationEffect.createOneShot(10, VibrationEffect.DEFAULT_AMPLITUDE))
+        }
     }
     viewModel.onButtonClick(btn.command)
 }
@@ -244,6 +273,7 @@ private val keypadButtons = listOf(
     KeypadButton("0", "0"), KeypadButton(".", "."), KeypadButton("C", "C"), KeypadButton("=", "=")
 )
 
+@Immutable
 data class KeypadButton(val display: String, val command: String)
 
 @Composable
@@ -269,7 +299,7 @@ private val proTools = listOf(
     ProTool(Icons.Default.CurrencyExchange, "Currency Converter", NexuraRoutes.CURRENCY),
     ProTool(Icons.Default.LocalGasStation, "Fuel Cost", NexuraRoutes.FUEL),
     ProTool(Icons.Default.HealthAndSafety, "BMI/Health", NexuraRoutes.BMI),
-    ProTool(Icons.Default.CompareArrows, "Unit Price", NexuraRoutes.UNIT_PRICE),
+    ProTool(Icons.AutoMirrored.Filled.CompareArrows, "Unit Price", NexuraRoutes.UNIT_PRICE),
     ProTool(Icons.Default.AttachMoney, "Investment", NexuraRoutes.INVESTMENT),
     ProTool(Icons.Default.ShoppingCart, "Discount/Tax", NexuraRoutes.DISCOUNT),
     ProTool(Icons.Default.Landscape, "Land Converter", NexuraRoutes.LAND),
@@ -277,6 +307,7 @@ private val proTools = listOf(
     ProTool(Icons.Default.PriorityHigh, "Factorial (!)", NexuraRoutes.FACTORIAL)
 )
 
+@Immutable
 data class ProTool(val icon: androidx.compose.ui.graphics.vector.ImageVector, val title: String, val route: String)
 
 @OptIn(ExperimentalMaterial3Api::class)

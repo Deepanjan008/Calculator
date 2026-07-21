@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -50,7 +51,7 @@ fun DiscountTaxScreen(navController: NavController) {
             OutlinedTextField(
                 value = originalPrice, onValueChange = { originalPrice = it; showError = false },
                 label = { Text("Original Price") }, isError = showError && originalPrice.isEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
             )
             Spacer(Modifier.height(16.dp))
@@ -58,14 +59,14 @@ fun DiscountTaxScreen(navController: NavController) {
                 OutlinedTextField(
                     value = discountPercent, onValueChange = { discountPercent = it; showError = false },
                     label = { Text("Discount (%)") }, isError = showError && discountPercent.isEmpty(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp)
                 )
                 Spacer(Modifier.width(12.dp))
                 OutlinedTextField(
                     value = taxPercent, onValueChange = { taxPercent = it; showError = false },
                     label = { Text("Tax (%)") }, isError = showError && taxPercent.isEmpty(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp)
                 )
             }
@@ -88,12 +89,39 @@ fun DiscountTaxScreen(navController: NavController) {
 
             if (resultAmount.isNotEmpty()) {
                 Spacer(Modifier.height(40.dp))
-                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                    Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp).fillMaxWidth().wrapContentHeight(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text("Final Price", style = MaterialTheme.typography.titleMedium)
-                        Text(text = resultAmount, fontSize = 42.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.height(8.dp))
-                        Text(text = "Total Discount: $resultSavings", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                        val fontSize = when {
+                            resultAmount.length <= 8 -> 42.sp
+                            resultAmount.length <= 14 -> 30.sp
+                            resultAmount.length <= 20 -> 22.sp
+                            else -> 16.sp
+                        }
+                        Text(
+                            text = resultAmount,
+                            fontSize = fontSize,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = "Total Discount: $resultSavings",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }

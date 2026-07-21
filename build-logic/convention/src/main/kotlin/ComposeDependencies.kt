@@ -7,7 +7,7 @@ import org.gradle.kotlin.dsl.dependencies
  * screen-owning module (feature modules, core:ui) needs. Debug-only tooling deps are added too.
  */
 internal fun Project.configureComposeDependencies(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
         // compileSdk / minSdk already set by configureKotlinAndroid via the base convention plugin

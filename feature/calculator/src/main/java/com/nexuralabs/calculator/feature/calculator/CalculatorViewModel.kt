@@ -128,22 +128,43 @@ class CalculatorViewModel @Inject constructor(
 
         val output = java.util.ArrayDeque<BigDecimal>()
         val ops = java.util.ArrayDeque<String>()
-        val precedence = mapOf("+" to 1, "-" to 1, "*" to 2, "/" to 2, "^" to 3, "√" to 4)
+        val precedence = mapOf("+" to 1, "-" to 1, "*" to 2, "/" to 2, "^" to 3, "u-" to 4, "√" to 4)
+        val rightAssociative = setOf("u-", "√")
+
+        var lastWasOperator = true
 
         for (token in tokens) {
+            var mappedToken = token
+            if (token == "-" && lastWasOperator) {
+                mappedToken = "u-"
+            }
+
             when {
-                token.toBigDecimalOrNull() != null -> output.addLast(token.toBigDecimal())
-                token == "%" -> {
+                mappedToken.toBigDecimalOrNull() != null -> {
+                    output.addLast(mappedToken.toBigDecimal())
+                    lastWasOperator = false
+                }
+                mappedToken == "%" -> {
                     if (output.isNotEmpty()) {
                         val v = output.removeLast()
                         output.addLast(v.divide(BigDecimal("100"), java.math.MathContext.DECIMAL128))
                     }
+                    lastWasOperator = false
                 }
-                precedence.containsKey(token) -> {
-                    while (ops.isNotEmpty() && precedence.getOrDefault(ops.last(), 0) >= precedence[token]!!) {
-                        applyOp(output, ops.removeLast())
+                precedence.containsKey(mappedToken) -> {
+                    val isRight = mappedToken in rightAssociative
+                    val currPrec = precedence[mappedToken] ?: 0
+                    while (ops.isNotEmpty()) {
+                        val top = ops.last()
+                        val topPrec = precedence.getOrDefault(top, 0)
+                        if (topPrec > currPrec || (!isRight && topPrec == currPrec)) {
+                            applyOp(output, ops.removeLast())
+                        } else {
+                            break
+                        }
                     }
-                    ops.addLast(token)
+                    ops.addLast(mappedToken)
+                    lastWasOperator = true
                 }
             }
         }
@@ -156,6 +177,12 @@ class CalculatorViewModel @Inject constructor(
             if (output.isEmpty()) return
             val a = output.removeLast()
             output.addLast(BigDecimal(Math.sqrt(a.toDouble())))
+            return
+        }
+        if (op == "u-") {
+            if (output.isEmpty()) return
+            val a = output.removeLast()
+            output.addLast(a.negate())
             return
         }
         if (output.size < 2) return

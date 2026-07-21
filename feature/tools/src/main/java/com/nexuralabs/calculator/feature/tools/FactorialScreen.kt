@@ -5,10 +5,10 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
@@ -35,11 +35,18 @@ fun FactorialScreen(navController: NavController) {
     var input by remember { mutableStateOf("") }
     var fullResult by remember { mutableStateOf("") }
     var scientificResult by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     var isCalculating by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
+
+    val displayChunks = remember(fullResult) {
+        if (fullResult.isEmpty()) emptyList()
+        else if (fullResult.length > 2000) fullResult.chunked(1000)
+        else listOf(fullResult)
+    }
 
     Scaffold(
         topBar = {
@@ -47,7 +54,7 @@ fun FactorialScreen(navController: NavController) {
                 title = { Text("Factorial Calculator") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -64,12 +71,21 @@ fun FactorialScreen(navController: NavController) {
 
             OutlinedTextField(
                 value = input,
-                onValueChange = { 
-                    if (it.isEmpty() || it.all { char -> char.isDigit() }) {
-                        input = it 
+                onValueChange = { newValue ->
+                    if (newValue.isEmpty() || (newValue.all { it.isDigit() } && newValue.length <= 7)) {
+                        input = newValue
+                        errorMessage = null
                     }
                 },
-                label = { Text("Enter a number (e.g., 100)") },
+                label = { Text("Enter a number") },
+                supportingText = {
+                    if (errorMessage != null) {
+                        Text(errorMessage!!, color = MaterialTheme.colorScheme.error)
+                    } else {
+                        Text("Max 100,000")
+                    }
+                },
+                isError = errorMessage != null,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -80,29 +96,44 @@ fun FactorialScreen(navController: NavController) {
 
             Button(
                 onClick = {
+                    keyboardController?.hide()
                     val n = input.toIntOrNull()
-                    if (n != null && n >= 0) {
-                        if (n > 10000) {
-                            Toast.makeText(context, "Number too large! Max 10000", Toast.LENGTH_SHORT).show()
+
+                    when {
+                        input.isEmpty() -> {
+                            errorMessage = "Input cannot be empty"
                             return@Button
                         }
-                        keyboardController?.hide()
-                        isCalculating = true
-                        scope.launch {
-                            val res = calculateFactorial(n)
+                        n == null || n < 0 -> {
+                            errorMessage = "Enter a valid positive number"
+                            return@Button
+                        }
+                        n > 100000 -> {
+                            errorMessage = "Number too large! Max is 100,000"
+                            return@Button
+                        }
+                    }
+
+                    errorMessage = null
+                    fullResult = ""
+                    scientificResult = ""
+                    isCalculating = true
+
+                    scope.launch {
+                        try {
+                            val res = calculateFactorialFast(n)
                             fullResult = res
-                            scientificResult = if (res.length > 20) {
-                                "${res[0]}.${res.substring(1, 4)}e+${res.length - 1}"
-                            } else {
-                                ""
-                            }
+                            scientificResult = formatScientific(res)
+                        } catch (e: Exception) {
+                            errorMessage = e.localizedMessage ?: "Calculation failed"
+                        } finally {
                             isCalculating = false
                         }
-                    } else {
-                        Toast.makeText(context, "Enter a valid positive number", Toast.LENGTH_SHORT).show()
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 enabled = !isCalculating
             ) {
@@ -120,41 +151,50 @@ fun FactorialScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .wrapContentHeight()
                         .padding(bottom = 16.dp),
                     shape = RoundedCornerShape(28.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp).fillMaxWidth().wrapContentHeight(),
+                        modifier = Modifier
+                            .padding(24.dp)
+                            .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Spacer(Modifier.width(48.dp))
                             Text(
-                                "Result", 
+                                "Result",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.wrapContentHeight(),
                                 textAlign = TextAlign.Center
                             )
+                            Spacer(Modifier.width(8.dp))
                             IconButton(
                                 onClick = {
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                     val clip = ClipData.newPlainText("Factorial Result", fullResult)
                                     clipboard.setPrimaryClip(clip)
                                     Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show()
-                                }
+                                },
+                                modifier = Modifier.size(32.dp)
                             ) {
-                                Icon(Icons.Default.ContentCopy, "Copy", tint = MaterialTheme.colorScheme.primary)
+                                Icon(
+                                    Icons.Default.ContentCopy,
+                                    contentDescription = "Copy",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
                             }
                         }
-                        
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.primary.copy(0.1f))
+
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 12.dp),
+                            color = MaterialTheme.colorScheme.primary.copy(0.1f)
+                        )
 
                         if (scientificResult.isNotEmpty()) {
                             Text(
@@ -162,7 +202,6 @@ fun FactorialScreen(navController: NavController) {
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
                                 color = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.fillMaxWidth().wrapContentHeight(),
                                 textAlign = TextAlign.Center
                             )
                             Spacer(Modifier.height(12.dp))
@@ -172,24 +211,26 @@ fun FactorialScreen(navController: NavController) {
                             fullResult.length <= 10 -> 36.sp
                             fullResult.length <= 16 -> 26.sp
                             fullResult.length <= 22 -> 20.sp
-                            else -> 16.sp
+                            fullResult.length <= 100 -> 16.sp
+                            else -> 12.sp
                         }
 
-                        Box(
+                        LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
-                                .wrapContentHeight()
-                                .verticalScroll(rememberScrollState())
                         ) {
-                            Text(
-                                text = fullResult,
-                                fontSize = fontSize,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-                                textAlign = TextAlign.Center
-                            )
+                            items(displayChunks) { chunk ->
+                                Text(
+                                    text = chunk,
+                                    fontSize = fontSize,
+                                    lineHeight = (fontSize.value * 1.4).sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
                     }
                 }
@@ -198,11 +239,30 @@ fun FactorialScreen(navController: NavController) {
     }
 }
 
-// I have moved the heavy computation of large factorials to a background dispatcher to prevent blocking the UI thread.
-suspend fun calculateFactorial(n: Int): String = withContext(Dispatchers.Default) {
-    var result = BigInteger.ONE
-    for (i in 2..n) {
-        result *= BigInteger.valueOf(i.toLong())
+private fun formatScientific(result: String): String {
+    return if (result.length > 20) {
+        val mantissaPart = result.substring(1, minOf(4, result.length))
+        "≈ ${result[0]}.$mantissaPart e+${result.length - 1}"
+    } else {
+        ""
     }
-    result.toString()
+}
+
+suspend fun calculateFactorialFast(n: Int): String = withContext(Dispatchers.Default) {
+    if (n < 0) return@withContext "0"
+    if (n == 0 || n == 1) return@withContext "1"
+
+    fun treeProduct(left: Int, right: Int): BigInteger {
+        return when {
+            left > right -> BigInteger.ONE
+            left == right -> BigInteger.valueOf(left.toLong())
+            right - left == 1 -> BigInteger.valueOf(left.toLong() * right.toLong())
+            else -> {
+                val mid = (left + right) / 2
+                treeProduct(left, mid) * treeProduct(mid + 1, right)
+            }
+        }
+    }
+
+    treeProduct(2, n).toString()
 }

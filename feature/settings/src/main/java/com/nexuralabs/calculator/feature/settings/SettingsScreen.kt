@@ -25,19 +25,40 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(navController: NavController) {
     val viewModel: SettingsViewModel = hiltViewModel()
 
-    val precision by viewModel.precision.collectAsState(initial = 6)
-    val hapticEnabled by viewModel.hapticEnabled.collectAsState(initial = true)
-    val currentColorHex by viewModel.themeColorHex.collectAsState(initial = "#BB86FC")
+    val precision by viewModel.precision.collectAsStateWithLifecycle(initialValue = 6)
+    val hapticEnabled by viewModel.hapticEnabled.collectAsStateWithLifecycle(initialValue = true)
+    val currentColorHex by viewModel.themeColorHex.collectAsStateWithLifecycle(initialValue = "#BB86FC")
 
     var hexInput by remember(currentColorHex) { mutableStateOf(currentColorHex) }
     var showClearDialog by remember { mutableStateOf(false) }
+
+    // Local drag state: the slider and hue canvas update instantly while dragging, but only the
+    // final value is persisted to DataStore. Without this, every drag tick fired a DataStore
+    // write (disk IO on the IO dispatcher) which janked the gesture.
+    var pendingPrecision by remember { mutableStateOf(precision) }
+    var pendingColorHex by remember { mutableStateOf(currentColorHex) }
+
+    LaunchedEffect(pendingPrecision) {
+        delay(250)
+        if (pendingPrecision != precision) viewModel.setPrecision(pendingPrecision)
+    }
+    LaunchedEffect(pendingColorHex) {
+        delay(250)
+        if (pendingColorHex != currentColorHex) viewModel.setThemeColorHex(pendingColorHex)
+    }
+
+    // Keep local state in sync when the persisted value changes from elsewhere.
+    LaunchedEffect(precision) { pendingPrecision = precision }
+    LaunchedEffect(currentColorHex) { pendingColorHex = currentColorHex }
 
     Scaffold(
         topBar = {
@@ -73,8 +94,7 @@ fun SettingsScreen(navController: NavController) {
                         detectDragGestures { change, _ ->
                             val hue = (change.position.x / size.width).coerceIn(0f, 1f) * 360f
                             val colorInt = android.graphics.Color.HSVToColor(floatArrayOf(hue, 0.6f, 0.9f))
-                            val newHex = String.format("#%06X", 0xFFFFFF and colorInt)
-                            viewModel.setThemeColorHex(newHex)
+                            pendingColorHex = String.format("#%06X", 0xFFFFFF and colorInt)
                         }
                     }
             ) {
@@ -89,7 +109,7 @@ fun SettingsScreen(navController: NavController) {
                 onValueChange = { input ->
                     hexInput = input
                     if (input.length == 7 && input.startsWith("#")) {
-                        viewModel.setThemeColorHex(input)
+                        pendingColorHex = input
                     }
                 },
                 label = { Text("Theme Hex Code") },
@@ -101,7 +121,7 @@ fun SettingsScreen(navController: NavController) {
                         modifier = Modifier
                             .size(24.dp)
                             .clip(CircleShape)
-                            .background(try { Color(android.graphics.Color.parseColor(currentColorHex)) } catch (e: Exception) { Color.Gray })
+                            .background(try { Color(android.graphics.Color.parseColor(pendingColorHex)) } catch (e: Exception) { Color.Gray })
                     )
                 }
             )
@@ -113,8 +133,8 @@ fun SettingsScreen(navController: NavController) {
             // --- DECIMAL PRECISION SECTION ---
             Text("Decimal Precision", style = MaterialTheme.typography.titleMedium)
             Slider(
-                value = precision.toFloat(),
-                onValueChange = { newVal -> viewModel.setPrecision(newVal.toInt()) },
+                value = pendingPrecision.toFloat(),
+                onValueChange = { newVal -> pendingPrecision = newVal.toInt() },
                 valueRange = 0f..10f,
                 steps = 9
             )

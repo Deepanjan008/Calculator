@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.nexuralabs.calculator.core.navigation.NexuraRoutes
 import com.nexuralabs.calculator.core.navigation.ObserveHistorySelection
@@ -41,9 +42,17 @@ fun CalculatorScreen(
 ) {
     val viewModel: CalculatorViewModel = hiltViewModel()
     val context = LocalContext.current
-    val expression by viewModel.expression.collectAsState()
-    val preview by viewModel.preview.collectAsState()
-    val hapticEnabled by viewModel.hapticEnabled.collectAsState()
+    val expression by viewModel.expression.collectAsStateWithLifecycle()
+    val preview by viewModel.preview.collectAsStateWithLifecycle()
+    val hapticEnabled by viewModel.hapticEnabled.collectAsStateWithLifecycle()
+
+    // Stable click handler: only recreated when its inputs change, so the 20 keypad buttons
+    // stay skippable between recompositions triggered by unrelated state (e.g. the preview
+    // updating on the display). Reading hapticEnabled here captures the latest value without
+    // invalidating the per-button lambdas.
+    val onButtonClick: (KeypadButton) -> Unit = remember(viewModel, context, hapticEnabled) {
+        { btn -> handleButtonClick(btn, hapticEnabled, context, viewModel) }
+    }
 
     // Fixes the old "tap a history entry, nothing loads" bug: HistoryScreen used to grab its own
     // hiltViewModel<CalculatorViewModel>() instance (scoped to the history destination, not this
@@ -180,7 +189,9 @@ fun CalculatorScreen(
                         horizontalAlignment = Alignment.End,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        DisplaySection(expression, preview, expressionFontSize, previewFontSize, viewModel)
+                        DisplaySection(expression, preview, expressionFontSize, previewFontSize) {
+                            viewModel.onButtonClick("⌫")
+                        }
                     }
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(4),
@@ -190,7 +201,7 @@ fun CalculatorScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         items(keypadButtons, key = { it.display }) { btn ->
-                            KeypadButton(btn) { handleButtonClick(btn, hapticEnabled, context, viewModel) }
+                            KeypadButton(btn) { onButtonClick(btn) }
                         }
                     }
                 }
@@ -201,7 +212,9 @@ fun CalculatorScreen(
                         horizontalAlignment = Alignment.End,
                         verticalArrangement = Arrangement.Bottom
                     ) {
-                        DisplaySection(expression, preview, expressionFontSize, previewFontSize, viewModel)
+                        DisplaySection(expression, preview, expressionFontSize, previewFontSize) {
+                            viewModel.onButtonClick("⌫")
+                        }
                         Spacer(Modifier.height(40.dp))
                     }
                     LazyVerticalGrid(
@@ -212,7 +225,7 @@ fun CalculatorScreen(
                         modifier = Modifier.weight(3.8f)
                     ) {
                         items(keypadButtons, key = { it.display }) { btn ->
-                            KeypadButton(btn) { handleButtonClick(btn, hapticEnabled, context, viewModel) }
+                            KeypadButton(btn) { onButtonClick(btn) }
                         }
                     }
                 }
@@ -227,7 +240,7 @@ private fun DisplaySection(
     preview: String,
     expressionFontSize: androidx.compose.ui.unit.TextUnit,
     previewFontSize: androidx.compose.ui.unit.TextUnit,
-    viewModel: CalculatorViewModel
+    onBackspace: () -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
@@ -238,7 +251,7 @@ private fun DisplaySection(
             maxLines = 1,
             modifier = Modifier.weight(1f).horizontalScroll(rememberScrollState())
         )
-        IconButton(onClick = { viewModel.onButtonClick("⌫") }) {
+        IconButton(onClick = onBackspace) {
             Icon(Icons.AutoMirrored.Filled.Backspace, "Delete", tint = MaterialTheme.colorScheme.primary)
         }
     }
@@ -276,9 +289,11 @@ private val keypadButtons = listOf(
 @Immutable
 data class KeypadButton(val display: String, val command: String)
 
+private val operatorButtons = setOf("÷", "×", "−", "+", "=", "%", "^", "√")
+
 @Composable
 private fun KeypadButton(btn: KeypadButton, onClick: () -> Unit) {
-    val isOperator = btn.display in listOf("÷", "×", "−", "+", "=", "%", "^", "√")
+    val isOperator = btn.display in operatorButtons
     Button(
         onClick = onClick,
         modifier = Modifier.aspectRatio(1f),

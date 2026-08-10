@@ -9,11 +9,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.nexuralabs.calculator.core.data.repository.PreferencesRepository
 import com.nexuralabs.calculator.core.ui.theme.AppTheme
@@ -29,8 +29,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val themeMode by preferencesRepository.themeMode.collectAsState(initial = "system")
-            val colorHex by preferencesRepository.themeColorHex.collectAsState(initial = "#BB86FC")
+            val themeMode by preferencesRepository.themeMode.collectAsStateWithLifecycle(initialValue = "system")
+            val colorHex by preferencesRepository.themeColorHex.collectAsStateWithLifecycle(initialValue = "#BB86FC")
 
             val isDarkTheme = when (themeMode.lowercase()) {
                 "dark" -> true

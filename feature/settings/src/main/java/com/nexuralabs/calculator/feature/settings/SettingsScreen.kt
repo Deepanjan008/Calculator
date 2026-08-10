@@ -39,6 +39,8 @@ fun SettingsScreen(navController: NavController) {
     var hexInput by remember(currentColorHex) { mutableStateOf(currentColorHex) }
     var showClearDialog by remember { mutableStateOf(false) }
 
+    val hueBrush = remember { Brush.horizontalGradient(List(361) { Color.hsv(it.toFloat(), 1f, 1f) }) }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -78,8 +80,7 @@ fun SettingsScreen(navController: NavController) {
                         }
                     }
             ) {
-                val colors = List(361) { Color.hsv(it.toFloat(), 1f, 1f) }
-                drawRect(brush = Brush.horizontalGradient(colors))
+                drawRect(brush = hueBrush)
             }
 
             Spacer(Modifier.height(20.dp))

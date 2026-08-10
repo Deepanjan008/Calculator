@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlin.math.pow
 
+private val compoundingFrequencies = listOf("Annually", "Semi-Annually", "Quarterly", "Monthly")
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InvestmentScreen(navController: NavController) {
@@ -32,7 +34,7 @@ fun InvestmentScreen(navController: NavController) {
     var showError by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val frequencies = listOf("Annually", "Semi-Annually", "Quarterly", "Monthly")
+    val frequencies = compoundingFrequencies
 
     Scaffold(
         topBar = {

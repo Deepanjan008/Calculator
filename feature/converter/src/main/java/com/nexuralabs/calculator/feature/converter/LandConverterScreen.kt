@@ -20,6 +20,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import java.util.*
 
+private val landUnits = listOf("Decimal", "Katha", "Bigha", "Acre", "Shotok")
+private val landToDecimal = mapOf("Decimal" to 1.0, "Katha" to 1.653, "Bigha" to 33.057, "Acre" to 100.0, "Shotok" to 1.0)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LandConverterScreen(navController: NavController) {
@@ -30,8 +33,8 @@ fun LandConverterScreen(navController: NavController) {
     var showError by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val units = listOf("Decimal", "Katha", "Bigha", "Acre", "Shotok")
-    val toDecimal = mapOf("Decimal" to 1.0, "Katha" to 1.653, "Bigha" to 33.057, "Acre" to 100.0, "Shotok" to 1.0)
+    val units = landUnits
+    val toDecimal = landToDecimal
 
     Scaffold(
         topBar = {

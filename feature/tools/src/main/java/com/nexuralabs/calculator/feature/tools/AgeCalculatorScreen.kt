@@ -29,22 +29,29 @@ import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
+private val nonDigitRegex = Regex("[^0-9]")
+
+private data class AgeSnapshot(
+    val years: Int,
+    val months: Int,
+    val days: Int,
+    val hours: Int,
+    val minutes: Int,
+    val seconds: Int,
+    val totalDaysLived: Long,
+    val totalWeeksLived: Long
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgeCalculatorScreen(navController: NavController) {
     var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
     var isValid by remember { mutableStateOf(true) }
     var birthDateTime by remember { mutableStateOf<LocalDateTime?>(null) }
-    
-    // Stats states
-    var years by remember { mutableIntStateOf(0) }
-    var months by remember { mutableIntStateOf(0) }
-    var days by remember { mutableIntStateOf(0) }
-    var hours by remember { mutableIntStateOf(0) }
-    var minutes by remember { mutableIntStateOf(0) }
-    var seconds by remember { mutableIntStateOf(0) }
-    var totalDaysLived by remember { mutableLongStateOf(0L) }
-    var totalWeeksLived by remember { mutableLongStateOf(0L) }
+
+    // Single snapshot updated once per second instead of 8 separate state writes,
+    // so the whole screen only recomposes once per tick.
+    var ageSnapshot by remember { mutableStateOf<AgeSnapshot?>(null) }
 
     // Live ticking effect
     LaunchedEffect(birthDateTime) {
@@ -53,21 +60,22 @@ fun AgeCalculatorScreen(navController: NavController) {
             val now = LocalDateTime.now()
             val birthDateOnly = birthDateTime!!.toLocalDate()
             val nowDateOnly = now.toLocalDate()
-            
+
             val period = Period.between(birthDateOnly, nowDateOnly)
             val duration = Duration.between(birthDateTime, now)
 
-            years = period.years
-            months = period.months
-            days = period.days
-            
-            hours = (duration.toHours() % 24).toInt()
-            minutes = (duration.toMinutes() % 60).toInt()
-            seconds = (duration.seconds % 60).toInt()
-            
-            totalDaysLived = ChronoUnit.DAYS.between(birthDateOnly, nowDateOnly)
-            totalWeeksLived = totalDaysLived / 7
-            
+            val totalDaysLived = ChronoUnit.DAYS.between(birthDateOnly, nowDateOnly)
+            ageSnapshot = AgeSnapshot(
+                years = period.years,
+                months = period.months,
+                days = period.days,
+                hours = (duration.toHours() % 24).toInt(),
+                minutes = (duration.toMinutes() % 60).toInt(),
+                seconds = (duration.seconds % 60).toInt(),
+                totalDaysLived = totalDaysLived,
+                totalWeeksLived = totalDaysLived / 7
+            )
+
             delay(1000L)
         }
     }
@@ -95,7 +103,7 @@ fun AgeCalculatorScreen(navController: NavController) {
             OutlinedTextField(
                 value = textFieldValue,
                 onValueChange = { new ->
-                    val digits = new.text.replace("[^0-9]".toRegex(), "")
+                    val digits = new.text.replace(nonDigitRegex, "")
                     if (digits.length <= 8) {
                         val formatted = buildString {
                             for (i in digits.indices) {
@@ -161,90 +169,96 @@ fun AgeCalculatorScreen(navController: NavController) {
             Spacer(Modifier.height(40.dp))
 
             if (birthDateTime != null) {
-                Card(
-                    modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-                    shape = RoundedCornerShape(28.dp),
-                    elevation = CardDefaults.cardElevation(8.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp).fillMaxWidth().wrapContentHeight(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        val yearsText = "$years Years"
-                        val yearsFontSize = when {
-                            yearsText.length <= 10 -> 36.sp
-                            yearsText.length <= 16 -> 26.sp
-                            else -> 18.sp
+                val snapshot = ageSnapshot
+                if (snapshot != null) {
+                    LiveAgeResultCard(snapshot)
+                    Spacer(Modifier.height(16.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Card(modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp)) {
+                            Column(Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("Total Weeks", fontSize = 14.sp)
+                                Text("${snapshot.totalWeeksLived}", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
-                        Text(
-                            text = yearsText,
-                            fontSize = yearsFontSize,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        
-                        val daysText = "$months Months, $days Days"
-                        val daysFontSize = when {
-                            daysText.length <= 18 -> 22.sp
-                            daysText.length <= 26 -> 18.sp
-                            else -> 14.sp
-                        }
-                        Text(
-                            text = daysText,
-                            fontSize = daysFontSize,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-                            textAlign = TextAlign.Center
-                        )
-                        
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
-                        
-                        Text(
-                            "Live Ticking",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                            modifier = Modifier.wrapContentHeight(),
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        val tickingText = "${String.format("%02d", hours)}h : ${String.format("%02d", minutes)}m : ${String.format("%02d", seconds)}s"
-                        val tickingFontSize = when {
-                            tickingText.length <= 16 -> 28.sp
-                            else -> 20.sp
-                        }
-                        Text(
-                            text = tickingText,
-                            fontSize = tickingFontSize,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-                
-                Spacer(Modifier.height(16.dp))
-                
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Card(modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp)) {
-                        Column(Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Total Weeks", fontSize = 14.sp)
-                            Text("$totalWeeksLived", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                    Card(modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp)) {
-                        Column(Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Total Days", fontSize = 14.sp)
-                            Text("$totalDaysLived", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Card(modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp)) {
+                            Column(Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("Total Days", fontSize = 14.sp)
+                                Text("${snapshot.totalDaysLived}", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun LiveAgeResultCard(snapshot: AgeSnapshot) {
+    Card(
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+        shape = RoundedCornerShape(28.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp).fillMaxWidth().wrapContentHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            val yearsText = "${snapshot.years} Years"
+            val yearsFontSize = when {
+                yearsText.length <= 10 -> 36.sp
+                yearsText.length <= 16 -> 26.sp
+                else -> 18.sp
+            }
+            Text(
+                text = yearsText,
+                fontSize = yearsFontSize,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(4.dp))
+
+            val daysText = "${snapshot.months} Months, ${snapshot.days} Days"
+            val daysFontSize = when {
+                daysText.length <= 18 -> 22.sp
+                daysText.length <= 26 -> 18.sp
+                else -> 14.sp
+            }
+            Text(
+                text = daysText,
+                fontSize = daysFontSize,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                textAlign = TextAlign.Center
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+            Text(
+                "Live Ticking",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                modifier = Modifier.wrapContentHeight(),
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(4.dp))
+            val tickingText = "${String.format("%02d", snapshot.hours)}h : ${String.format("%02d", snapshot.minutes)}m : ${String.format("%02d", snapshot.seconds)}s"
+            val tickingFontSize = when {
+                tickingText.length <= 16 -> 28.sp
+                else -> 20.sp
+            }
+            Text(
+                text = tickingText,
+                fontSize = tickingFontSize,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

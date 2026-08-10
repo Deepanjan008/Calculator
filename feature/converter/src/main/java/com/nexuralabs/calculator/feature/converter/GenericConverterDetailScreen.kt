@@ -31,7 +31,7 @@ fun GenericConverterDetailScreen(navController: NavController, category: String)
     var resultText by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
 
-    val units = getUnitsForCategory(category)
+    val units = remember(category) { getUnitsForCategory(category) }
     if (fromUnit.isEmpty() && units.isNotEmpty()) fromUnit = units[0]
     if (toUnit.isEmpty() && units.size > 1) toUnit = units[1]
 

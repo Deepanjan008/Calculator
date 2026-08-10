@@ -6,7 +6,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -265,7 +265,7 @@ fun FactorialScreen(navController: NavController) {
                                         .fillMaxWidth()
                                         .fillMaxHeight()
                                 ) {
-                                    items(displayChunks) { chunk ->
+                                    itemsIndexed(displayChunks, key = { index, _ -> index }) { _, chunk ->
                                         Text(
                                             text = chunk,
                                             fontSize = fontSize,

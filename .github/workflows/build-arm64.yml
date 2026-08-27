@@ -5,50 +5,55 @@ on:
 
 jobs:
   build-arm64:
-    # Step 1: ARM Processor Linux Setup (Native ARM64 Runner)
     runs-on: ubuntu-24.04-arm
 
     steps:
-      - name: Step 1 - Checkout Repository
+      - name: 1. Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Step 1 - Setup Java 21 Environment
+      - name: 2. Setup Java 21 Environment
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      # Step 2 & 3: Download Android Command-Line Tools & Export PATH/ANDROID_HOME
-      - name: Step 2 & 3 - Download Android SDK Tools & Export Path
+      - name: 3. Install System Native ARM64 AAPT2
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y aapt2 android-sdk
+
+      - name: 4. Download Android Command-Line Tools
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME/android-sdk/cmdline-tools
-          
-          # Downloading official Android Command Line Tools
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
           unzip -q cmdline-tools.zip
           mv cmdline-tools latest
           rm cmdline-tools.zip
 
-          # Setting up ANDROID_HOME and PATH in GitHub Environment
+      - name: 5. Export Android SDK Environment Variables
+        run: |
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
 
-      # Step 4: Accept All SDK Licenses & Install Required SDK Components
-      - name: Step 4 - Accept SDK Licenses & Install Components
+      - name: 6. Update SDK Manager & Accept Licenses
         run: |
           yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses
-          sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          sdkmanager --sdk_root=$ANDROID_HOME --update
 
-      # Step 5: Execute Debug Build using Gradle
-      - name: Step 5 - Run Gradle Debug Build
+      - name: 7. Install Android SDK 36 Components
         run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
-      # Step 6: Upload Generated Debug APK Artifact
-      - name: Step 6 - Upload Debug APK Artifact
+      - name: 8. Execute Gradle Debug Build (AAPT2 CLI Override)
+        run: |
+          SYSTEM_AAPT2_PATH=$(which aapt2)
+          echo "Using system ARM64 AAPT2 at: $SYSTEM_AAPT2_PATH"
+          chmod +x gradlew
+          ./gradlew assembleDebug -Pandroid.aapt2FromMavenOverride=$SYSTEM_AAPT2_PATH
+
+      - name: 9. Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-arm64-debug

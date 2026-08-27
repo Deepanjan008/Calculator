@@ -26,7 +26,7 @@ jobs:
               apt-get update && apt-get install -y openjdk-21-jdk wget unzip git
               export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-arm64
               chmod +x gradlew
-              ./gradlew assembleRelease --no-daemon
+               ./gradlew assembleDebug
             "
 
       - name: Upload Release APK Artifact

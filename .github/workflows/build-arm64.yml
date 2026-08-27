@@ -17,10 +17,10 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: 3. Install System Native ARM64 AAPT2 & Tools
+      - name: 3. Install System Native ARM64 AAPT2 & Tools (optional)
         run: |
           sudo apt-get update
-          sudo apt-get install -y android-sdk-build-tools android-sdk
+          sudo apt-get install -y android-sdk-build-tools android-sdk || true
 
       - name: 4. Download Android Command-Line Tools
         run: |
@@ -46,12 +46,20 @@ jobs:
         run: |
           sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
-   - name: 8. Execute Gradle Debug Build (AAPT2 CLI Override)
+      - name: 8. Execute Gradle Debug Build (AAPT2 Override)
         run: |
-          SYSTEM_AAPT2_PATH=$(which aapt2 || find /usr -name aapt2 2>/dev/null | head -n 1)
-          echo "Using system ARM64 AAPT2 at: $SYSTEM_AAPT2_PATH"
+          # প্রথমে SDK-র build-tools থেকে aapt2 খুঁজি, না পেলে সিস্টেমেরটা নিই
+          AAPT2_PATH="$ANDROID_HOME/build-tools/36.0.0/aapt2"
+          if [ ! -f "$AAPT2_PATH" ]; then
+            AAPT2_PATH=$(which aapt2 || find /usr -name aapt2 2>/dev/null | head -n 1)
+          fi
+          if [ -z "$AAPT2_PATH" ]; then
+            echo "ERROR: aapt2 not found!"
+            exit 1
+          fi
+          echo "Using aapt2 at: $AAPT2_PATH"
           chmod +x gradlew
-          ./gradlew assembleDebug -Pandroid.aapt2FromMavenOverride=$SYSTEM_AAPT2_PATH
+          ./gradlew assembleDebug -Pandroid.aapt2FromMavenOverride="$AAPT2_PATH"
 
       - name: 9. Upload Debug APK Artifact
         uses: actions/upload-artifact@v4

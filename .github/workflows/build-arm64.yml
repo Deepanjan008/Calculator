@@ -1,36 +1,55 @@
-name: Android ARM64 Release Build (QEMU Emulated)
+name: Android ARM64 Native Build Pipeline
 
 on:
   workflow_dispatch:
 
 jobs:
   build-arm64:
-    runs-on: ubuntu-latest
+    # Step 1: ARM Processor Linux Setup (Native ARM64 Runner)
+    runs-on: ubuntu-24.04-arm
 
     steps:
-      - name: Checkout Repository
+      - name: Step 1 - Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up QEMU for ARM64 Emulation
-        uses: docker/setup-qemu-action@v3
+      - name: Step 1 - Setup Java 21 Environment
+        uses: actions/setup-java@v4
         with:
-          platforms: arm64
+          distribution: 'temurin'
+          java-version: '21'
 
-      - name: Build inside ARM64 Container
+      # Step 2 & 3: Download Android Command-Line Tools & Export PATH/ANDROID_HOME
+      - name: Step 2 & 3 - Download Android SDK Tools & Export Path
         run: |
-          docker run --rm \
-            --platform linux/arm64 \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            ubuntu:22.04 bash -c "
-              apt-get update && apt-get install -y openjdk-21-jdk wget unzip git
-              export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-arm64
-              chmod +x gradlew
-               ./gradlew assembleDebug
-            "
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk/cmdline-tools
+          
+          # Downloading official Android Command Line Tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+          unzip -q cmdline-tools.zip
+          mv cmdline-tools latest
+          rm cmdline-tools.zip
 
-      - name: Upload Release APK Artifact
+          # Setting up ANDROID_HOME and PATH in GitHub Environment
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+
+      # Step 4: Accept All SDK Licenses & Install Required SDK Components
+      - name: Step 4 - Accept SDK Licenses & Install Components
+        run: |
+          yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses
+          sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      # Step 5: Execute Debug Build using Gradle
+      - name: Step 5 - Run Gradle Debug Build
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      # Step 6: Upload Generated Debug APK Artifact
+      - name: Step 6 - Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-arm64-release
-          path: app/build/outputs/apk/release/*.apk
+          name: app-arm64-debug
+          path: app/build/outputs/apk/debug/*.apk

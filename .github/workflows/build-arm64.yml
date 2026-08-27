@@ -1,0 +1,36 @@
+name: Android ARM64 Release Build (QEMU Emulated)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-arm64:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU for ARM64 Emulation
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build inside ARM64 Container
+        run: |
+          docker run --rm \
+            --platform linux/arm64 \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            ubuntu:22.04 bash -c "
+              apt-get update && apt-get install -y openjdk-21-jdk wget unzip git
+              export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-arm64
+              chmod +x gradlew
+              ./gradlew assembleRelease --no-daemon
+            "
+
+      - name: Upload Release APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-arm64-release
+          path: app/build/outputs/apk/release/*.apk

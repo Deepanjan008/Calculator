@@ -46,17 +46,15 @@ jobs:
         run: |
           sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
-      - name: 8. Execute Gradle Debug Build (AAPT2 CLI Override)
+      - name: 8. Execute Gradle Debug Build (Official SDK AAPT2 Override)
         run: |
-          # Find genuine Ubuntu ARM64 compiled binary path (aapt2 or aapt)
-          SYSTEM_AAPT2_PATH=$(which aapt2 || which aapt || find /usr -name "aapt*" -type f -executable 2>/dev/null | head -n 1)
-          if [ -z "$SYSTEM_AAPT2_PATH" ]; then
-            echo "ERROR: No aapt/aapt2 found in system!"
-            exit 1
-          fi
-          echo "Using true native ARM64 AAPT at: $SYSTEM_AAPT2_PATH"
+          # Pointing directly to Google's official Android SDK 36 AAPT2 binary
+          SDK_AAPT2_PATH="$ANDROID_HOME/build-tools/36.0.0/aapt2"
+          chmod +x "$SDK_AAPT2_PATH"
+          echo "Using Official Android SDK AAPT2 at: $SDK_AAPT2_PATH"
+          
           chmod +x gradlew
-          ./gradlew assembleDebug -Pandroid.aapt2FromMavenOverride="$SYSTEM_AAPT2_PATH"
+          ./gradlew assembleDebug -Pandroid.aapt2FromMavenOverride=$SDK_AAPT2_PATH
 
       - name: 9. Upload Debug APK Artifact
         uses: actions/upload-artifact@v4

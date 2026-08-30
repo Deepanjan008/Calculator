@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import java.util.Locale
 import kotlin.math.pow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,8 +84,8 @@ fun BmiHealthScreen(navController: NavController) {
                         val bmi = w / ((h / 100).pow(2))
                         val bmr = if (isMale) 88.362 + (13.397 * w) + (4.799 * h) - (5.677 * a)
                         else 447.593 + (9.247 * w) + (3.098 * h) - (4.330 * a)
-                        resultBmi = String.format("%.2f", bmi)
-                        resultBmr = String.format("%.0f kcal", bmr)
+                        resultBmi = String.format(Locale.US, "%.2f", bmi)
+                        resultBmr = String.format(Locale.US, "%.0f kcal", bmr)
                         showError = false; keyboardController?.hide()
                     } else { showError = true }
                 },

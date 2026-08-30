@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,8 +72,8 @@ fun FuelCostScreen(navController: NavController) {
                 onClick = {
                     val d = distance.toDoubleOrNull(); val p = fuelPrice.toDoubleOrNull(); val m = mileage.toDoubleOrNull()
                     if (d != null && p != null && m != null && m > 0) {
-                        resultFuel = String.format("%.2f Liters", d / m)
-                        resultCost = String.format("₹ %.2f", (d / m) * p)
+                        resultFuel = String.format(Locale.US, "%.2f Liters", d / m)
+                        resultCost = String.format(Locale.US, "₹ %.2f", (d / m) * p)
                         showError = false; keyboardController?.hide()
                     } else { showError = true }
                 },

@@ -25,6 +25,40 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+
+    // Per-architecture release APKs instead of one universal fat APK.
+    // Set isUniversalApk = true below if you also want a single all-in-one
+    // APK generated alongside the per-ABI ones (bigger file, works everywhere).
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            isUniversalApk = false
+        }
+    }
+}
+
+// Gives each ABI-specific APK a distinct versionCode (Google's recommended
+// scheme) so device package managers treat them as proper per-arch builds
+// instead of colliding on the same versionCode.
+val abiVersionCodes = mapOf(
+    "armeabi-v7a" to 1,
+    "arm64-v8a" to 2,
+    "x86" to 3,
+    "x86_64" to 4,
+)
+
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        variant.outputs.forEach { output ->
+            val abiFilter = output.filters.find {
+                it.filterType == com.android.build.api.variant.FilterConfiguration.FilterType.ABI
+            }?.identifier
+            val abiOffset = abiVersionCodes[abiFilter] ?: 0
+            output.versionCode.set((output.versionCode.orNull ?: 0) * 10 + abiOffset)
+        }
+    }
 }
 
 dependencies {

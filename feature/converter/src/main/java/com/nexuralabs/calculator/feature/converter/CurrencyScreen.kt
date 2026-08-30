@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,7 +86,7 @@ fun CurrencyScreen(navController: NavController) {
                     val amt = amount.toDoubleOrNull()
                     if (amt != null) {
                         val converted = amt * (rates[toCurrency]!! / rates[fromCurrency]!!)
-                        result = String.format("%.2f %s", converted, toCurrency)
+                        result = String.format(Locale.US, "%.2f %s", converted, toCurrency)
                         showError = false
                         keyboardController?.hide()
                     } else {

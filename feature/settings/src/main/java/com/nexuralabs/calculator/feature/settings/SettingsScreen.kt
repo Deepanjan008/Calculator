@@ -19,7 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -161,6 +165,62 @@ fun SettingsScreen(navController: NavController) {
                     }
                 )
             }
+
+            Spacer(Modifier.height(32.dp))
+            HorizontalDivider()
+            Spacer(Modifier.height(24.dp))
+
+            // --- ABOUT SECTION ---
+            Text("About", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "NCalculator is a modular, open-source calculator built for everyday " +
+                    "arithmetic, unit conversion, and quick finance tools.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(12.dp))
+
+            val uriHandler = LocalUriHandler.current
+            ListItem(
+                leadingContent = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_github),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                },
+                headlineContent = { Text("Source Code") },
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable { uriHandler.openUri("https://github.com/Nexura-Labs/Calculator.git") }
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            // Read the real installed versionName via PackageManager instead of
+            // hardcoding it here, so bumping versionName in build.gradle.kts is
+            // the only place a version bump is ever needed.
+            val context = LocalContext.current
+            val versionName = remember {
+                try {
+                    context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""
+                } catch (e: Exception) {
+                    ""
+                }
+            }
+            if (versionName.isNotEmpty()) {
+                Text(
+                    "Version $versionName",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
         }
     }
 }

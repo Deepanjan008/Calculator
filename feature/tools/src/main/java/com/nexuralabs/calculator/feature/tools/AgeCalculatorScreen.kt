@@ -28,6 +28,7 @@ import java.time.LocalDateTime
 import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -212,7 +213,7 @@ fun AgeCalculatorScreen(navController: NavController) {
                             textAlign = TextAlign.Center
                         )
                         Spacer(Modifier.height(4.dp))
-                        val tickingText = "${String.format("%02d", hours)}h : ${String.format("%02d", minutes)}m : ${String.format("%02d", seconds)}s"
+                        val tickingText = "${String.format(Locale.US, "%02d", hours)}h : ${String.format(Locale.US, "%02d", minutes)}m : ${String.format(Locale.US, "%02d", seconds)}s"
                         val tickingFontSize = when {
                             tickingText.length <= 16 -> 28.sp
                             else -> 20.sp

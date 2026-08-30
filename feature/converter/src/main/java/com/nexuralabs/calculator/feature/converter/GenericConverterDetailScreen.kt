@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,7 +72,7 @@ fun GenericConverterDetailScreen(navController: NavController, category: String)
                     if (v != null) {
                         val res = viewModel.convert(category, v, fromUnit, toUnit)
                         // Formatting result properly
-                        val formattedRes = if (res % 1.0 == 0.0) String.format("%.0f", res) else String.format("%.5f", res).trimEnd('0').trimEnd('.')
+                        val formattedRes = if (res % 1.0 == 0.0) String.format(Locale.US, "%.0f", res) else String.format(Locale.US, "%.5f", res).trimEnd('0').trimEnd('.')
                         resultText = "$formattedRes $toUnit"
                         showError = false; keyboardController?.hide()
                     } else { showError = true }

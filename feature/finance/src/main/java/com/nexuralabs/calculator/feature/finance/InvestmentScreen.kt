@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import java.util.Locale
 import kotlin.math.pow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,8 +87,8 @@ fun InvestmentScreen(navController: NavController) {
                     if (p != null && r != null && t != null) {
                         val n = when (frequency) { "Semi-Annually" -> 2.0; "Quarterly" -> 4.0; "Monthly" -> 12.0; else -> 1.0 }
                         val amount = p * (1 + r / (100 * n)).pow(n * t)
-                        resultAmount = String.format("₹ %,.2f", amount)
-                        resultInterest = String.format("₹ %,.2f", amount - p)
+                        resultAmount = String.format(Locale.US, "₹ %,.2f", amount)
+                        resultInterest = String.format(Locale.US, "₹ %,.2f", amount - p)
                         showError = false; keyboardController?.hide()
                     } else { showError = true }
                 },

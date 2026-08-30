@@ -71,12 +71,12 @@ fun FactorialScreen(navController: NavController) {
             OutlinedTextField(
                 value = input,
                 onValueChange = { newValue ->
-                    if (newValue.isEmpty() || (newValue.all { it.isDigit() } && newValue.length <= 7)) {
+                    if (newValue.isEmpty() || (newValue.all { it.isDigit() } && newValue.length <= 5)) {
                         input = newValue
                         errorMessage = ""
                     }
                 },
-                label = { Text("Enter a number (Max 100,000)") },
+                label = { Text("Enter a number (Max 10,000)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -107,8 +107,8 @@ fun FactorialScreen(navController: NavController) {
                             fullResult = ""
                             scientificResult = ""
                         }
-                        input.toInt() > 100000 -> {
-                            errorMessage = "Number exceeds limit (max 100,000)"
+                        input.toInt() > 10000 -> {
+                            errorMessage = "Number exceeds limit (max 10,000)"
                             fullResult = ""
                             scientificResult = ""
                         }
@@ -309,7 +309,7 @@ suspend fun calculateFactorialFast(n: Int): String = withContext(Dispatchers.Def
 
     fun treeProduct(left: Int, right: Int): BigInteger {
         // Cooperative cancellation check on every split, so a long-running
-        // recursion (e.g. n=100000) stops promptly if the composable is
+        // recursion (e.g. n=10000) stops promptly if the composable is
         // disposed, instead of wasting CPU/battery in the background
         ctx.ensureActive()
         return when {

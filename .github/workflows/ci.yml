@@ -41,7 +41,7 @@ jobs:
           -Dorg.gradle.jvmargs="-Xmx3g -XX:+UseG1GC"
 
     - name: Upload Signed APK
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: Nexura-Calculator-Signed
         path: app/build/outputs/apk/release/*.apk

@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: 1. Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 2. Setup Java 21 Environment
         uses: actions/setup-java@v4

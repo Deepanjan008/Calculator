@@ -17,6 +17,12 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 }
 
+                // Lint warnings fail the build here for the same reason compiler
+                // warnings do: the gate is only a gate if nothing slips past it.
+                lint {
+                    warningsAsErrors = true
+                }
+
                 configureKotlinAndroid(this)
             }
         }

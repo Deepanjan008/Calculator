@@ -28,6 +28,16 @@ internal fun Project.configureKotlinAndroid(
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+
+            // A warning is a build failure. Everything else in CONTRIBUTING.md
+            // assumes this line: a rule enforced only by review rots, and a
+            // deprecated call nobody acts on becomes a removal in the next
+            // release, discovered at the worst possible moment.
+            allWarningsAsErrors.set(true)
         }
+    }
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.add("-Werror")
     }
 }

@@ -41,16 +41,21 @@ fun CalculatorScreen(
 ) {
     val viewModel: CalculatorViewModel = hiltViewModel()
     val context = LocalContext.current
-    val expression by viewModel.expression.collectAsState()
-    val preview by viewModel.preview.collectAsState()
-    val hapticEnabled by viewModel.hapticEnabled.collectAsState()
+
+    // The screen is a function of one snapshot now. It no longer collects three
+    // flows and hopes they agree, and it no longer knows that a repository
+    // exists: it reads what the state holder decided and sends events back.
+    val state by viewModel.state.collectAsState()
+    val expression = state.expression
+    val preview = state.preview
+    val hapticEnabled = state.hapticEnabled
 
     // Fixes the old "tap a history entry, nothing loads" bug: HistoryScreen used to grab its own
     // hiltViewModel<CalculatorViewModel>() instance (scoped to the history destination, not this
     // screen) and write to it directly - the write never reached this screen's real ViewModel.
     // Now the selection travels back as a plain SavedStateHandle result instead.
     ObserveHistorySelection(navController) { selectedExpression ->
-        viewModel.loadFromHistory(selectedExpression)
+        viewModel.loadExpression(selectedExpression)
     }
 
     var showProTools by remember { mutableStateOf(false) }
@@ -238,7 +243,7 @@ private fun DisplaySection(
             maxLines = 1,
             modifier = Modifier.weight(1f).horizontalScroll(rememberScrollState())
         )
-        IconButton(onClick = { viewModel.onButtonClick("⌫") }) {
+        IconButton(onClick = { viewModel.pressKey("⌫") }) {
             Icon(Icons.AutoMirrored.Filled.Backspace, "Delete", tint = MaterialTheme.colorScheme.primary)
         }
     }
@@ -262,7 +267,7 @@ private fun handleButtonClick(btn: KeypadButton, hapticEnabled: Boolean, context
             vibrator?.vibrate(VibrationEffect.createOneShot(10, VibrationEffect.DEFAULT_AMPLITUDE))
         }
     }
-    viewModel.onButtonClick(btn.command)
+    viewModel.pressKey(btn.command)
 }
 
 private val keypadButtons = listOf(

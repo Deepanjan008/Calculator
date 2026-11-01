@@ -1,4 +1,4 @@
-package com.nexuralabs.calculator.core.data.db
+package com.nexuralabs.calculator.core.database.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

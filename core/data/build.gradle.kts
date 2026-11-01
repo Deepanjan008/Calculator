@@ -4,11 +4,9 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":core:domain"))
+    implementation(project(":core:database"))
+
     implementation(libs.findLibrary("androidx-core-ktx").get())
-
-    implementation(libs.findLibrary("androidx-room-runtime").get())
-    implementation(libs.findLibrary("androidx-room-ktx").get())
-    ksp(libs.findLibrary("androidx-room-compiler").get())
-
     implementation(libs.findLibrary("androidx-datastore-preferences").get())
 }

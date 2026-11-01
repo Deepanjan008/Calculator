@@ -37,6 +37,10 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                     includeInBundle = false
                 }
 
+                lint {
+                    warningsAsErrors = true
+                }
+
                 configureKotlinAndroid(this)
             }
         }

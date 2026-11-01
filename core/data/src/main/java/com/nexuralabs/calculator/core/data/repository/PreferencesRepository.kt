@@ -1,6 +1,7 @@
 package com.nexuralabs.calculator.core.data.repository
 
 import androidx.datastore.core.DataStore
+import com.nexuralabs.calculator.core.domain.repository.CalculatorPreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 class PreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>,
-) {
+) : CalculatorPreferences {
     private object Keys {
         val PRECISION = intPreferencesKey("precision")
         val HAPTIC = booleanPreferencesKey("haptic")
@@ -22,8 +23,8 @@ class PreferencesRepository @Inject constructor(
         val THEME_COLOR = stringPreferencesKey("theme_color")
     }
 
-    val precision: Flow<Int> = dataStore.data.map { it[Keys.PRECISION] ?: 6 }
-    val hapticEnabled: Flow<Boolean> = dataStore.data.map { it[Keys.HAPTIC] ?: true }
+    override val precision: Flow<Int> = dataStore.data.map { it[Keys.PRECISION] ?: 6 }
+    override val hapticEnabled: Flow<Boolean> = dataStore.data.map { it[Keys.HAPTIC] ?: true }
     val themeMode: Flow<String> = dataStore.data.map { it[Keys.THEME_MODE] ?: "system" }
     val themeColorHex: Flow<String> = dataStore.data.map { it[Keys.THEME_COLOR] ?: "#BB86FC" }
 

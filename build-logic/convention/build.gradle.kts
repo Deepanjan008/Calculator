@@ -44,5 +44,9 @@ gradlePlugin {
             id = "nexura.android.hilt"
             implementationClass = "AndroidHiltConventionPlugin"
         }
+        register("jvm") {
+            id = "nexura.jvm"
+            implementationClass = "KotlinJvmConventionPlugin"
+        }
     }
 }
